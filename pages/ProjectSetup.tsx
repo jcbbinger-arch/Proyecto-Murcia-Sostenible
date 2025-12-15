@@ -8,7 +8,7 @@ export const ProjectSetup: React.FC = () => {
     state, 
     assignTask, 
     updateTask6Roles, 
-    createPlaceholderDishes
+    updateDishDistribution
   } = useProject();
 
   // Local state for dish assignments (before saving to context)
@@ -32,8 +32,8 @@ export const ProjectSetup: React.FC = () => {
           alert("Por favor, asigna un responsable para cada uno de los 4 platos.");
           return;
       }
-      createPlaceholderDishes(dishAssignments);
-      alert("¡Distribución guardada! Ahora descarga el archivo de equipo.");
+      updateDishDistribution(dishAssignments);
+      alert("¡Distribución guardada! Si ya existían platos, se han actualizado los autores. Ahora descarga el archivo de equipo.");
   };
 
   const handleExportConfig = () => {
@@ -42,7 +42,7 @@ export const ProjectSetup: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `murcia_proyecto_MASTER_${state.teamName.replace(/\s+/g, '_')}.json`;
+    link.download = `murcia_proyecto_MASTER_${state.teamName.replace(/\s+/g, '_')}_config.json`;
     link.click();
   };
 

@@ -19,7 +19,7 @@ interface ProjectContextType {
   updateConcept: (key: keyof ProjectState['concept'], value: any) => void;
   updateMission: (role: keyof ProjectState['missions'], data: any) => void;
   addDish: (dish: Dish) => void;
-  createPlaceholderDishes: (assignments: { type: DishType, authorId: string, name: string }[]) => void;
+  updateDishDistribution: (assignments: { type: DishType, authorId: string, name: string }[]) => void;
   removeDish: (id: string) => void;
   updateDish: (dish: Dish) => void;
   updateMenuPrototype: (data: Partial<MenuPrototype>) => void;
@@ -197,26 +197,50 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
     setState(prev => ({ ...prev, dishes: [...prev.dishes, dishWithAuthor] }));
   };
 
-  const createPlaceholderDishes = (assignments: { type: DishType, authorId: string, name: string }[]) => {
-      const newDishes: Dish[] = assignments.map((assign) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        name: assign.name, 
-        type: assign.type,
-        servings: 1,
-        photo: null,
-        description: '',
-        elaboration: '',
-        ingredients: [],
-        allergens: [],
-        sustainabilityJustification: '',
-        cost: 0,
-        price: 0,
-        financials: { totalCost: 0, costPerServing: 0, foodCostPercent: 0, grossMargin: 0, grossMarginPercent: 0, salePrice: 0 },
-        priceJustification: '',
-        author: assign.authorId
-      }));
+  const updateDishDistribution = (assignments: { type: DishType, authorId: string, name: string }[]) => {
+      setState(prev => {
+          // Robust update: Try to preserve existing dish data if types match
+          const unassignedDishes = [...prev.dishes];
+          const newDishes: Dish[] = [];
 
-      setState(prev => ({ ...prev, dishes: newDishes }));
+          assignments.forEach(assign => {
+             // Find existing dish of this type
+             const matchIndex = unassignedDishes.findIndex(d => d.type === assign.type);
+             
+             if (matchIndex !== -1) {
+                 // Update existing dish author and keep data
+                 const existing = unassignedDishes[matchIndex];
+                 newDishes.push({
+                     ...existing,
+                     author: assign.authorId,
+                     // Only update name if it matches the generic assignment name or was empty
+                     name: (existing.name && existing.name.length > 3) ? existing.name : assign.name
+                 });
+                 unassignedDishes.splice(matchIndex, 1);
+             } else {
+                 // Create new dish entry
+                 newDishes.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: assign.name,
+                    type: assign.type,
+                    servings: 1,
+                    photo: null,
+                    description: '',
+                    elaboration: '',
+                    ingredients: [],
+                    allergens: [],
+                    sustainabilityJustification: '',
+                    cost: 0,
+                    price: 0,
+                    financials: { totalCost: 0, costPerServing: 0, foodCostPercent: 0, grossMargin: 0, grossMarginPercent: 0, salePrice: 0 },
+                    priceJustification: '',
+                    author: assign.authorId
+                 });
+             }
+          });
+          
+          return { ...prev, dishes: newDishes };
+      });
   };
 
   const removeDish = (id: string) => {
@@ -269,7 +293,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       updateConcept, 
       updateMission, 
       addDish, 
-      createPlaceholderDishes,
+      updateDishDistribution,
       removeDish, 
       updateDish,
       updateMenuPrototype,
