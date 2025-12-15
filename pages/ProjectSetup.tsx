@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { DishType, TeamMember } from '../types';
-import { Settings, Save, Download, CheckCircle, AlertTriangle } from 'lucide-react';
+import { DishType } from '../types';
+import { Settings, Save, Download, AlertTriangle } from 'lucide-react';
 
 export const ProjectSetup: React.FC = () => {
   const { 

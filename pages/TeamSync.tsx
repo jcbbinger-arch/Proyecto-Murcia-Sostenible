@@ -5,7 +5,6 @@ import { Download, Upload, User, Users, FileJson, Merge } from 'lucide-react';
 export const TeamSync: React.FC = () => {
   const { state, setCurrentUser, importProjectData, mergeContribution } = useProject();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const mergeInputRef = useRef<HTMLInputElement>(null);
   const [mergeStatus, setMergeStatus] = useState<string>('');
 
   const handleIdentify = (id: string) => {
@@ -51,30 +50,6 @@ export const TeamSync: React.FC = () => {
       };
       reader.readAsText(file);
     }
-  };
-
-  const handleMerge = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const data = JSON.parse(event.target?.result as string);
-            // We need to know WHO sent this file. 
-            // In a real app, we'd check metadata. Here, we'll ask the Coordinator.
-            // Simplified: We try to match content or just ask user.
-            
-            // Let's create a dialog or just a simple prompt for now, or infer from filename?
-            // Safer: Let the coordinator pick the member from a list BEFORE clicking upload, 
-            // but the input is hidden.
-            
-            // Wait, we need the UI to pick the member first.
-          } catch (error) {
-            alert("Error al leer el archivo.");
-          }
-        };
-        // We handle the actual logic in the Render part with a wrapper function
-      }
   };
 
   const triggerMergeForMember = (memberId: string) => {

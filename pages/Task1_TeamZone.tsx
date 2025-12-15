@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ZONES } from '../constants';
 import { useProject } from '../context/ProjectContext';
 import { TeamMember } from '../types';
-import { CheckCircle, FileText, Download, UserPlus, Trash, Printer, Eye, EyeOff, Upload, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle, FileText, UserPlus, Trash, Printer, Eye, EyeOff, Upload, Image as ImageIcon } from 'lucide-react';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { FileText, Users, CheckCircle, Lightbulb, Printer, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { Users, Lightbulb, Printer, ChevronDown, ChevronUp, Lock } from 'lucide-react';
 
 export const Task2_Analysis: React.FC = () => {
   const { state, assignTask, updateTaskContent, updateConcept } = useProject();

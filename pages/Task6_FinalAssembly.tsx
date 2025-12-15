@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Rocket, Palette, Hammer, BookOpen, Lock } from 'lucide-react';
+import { Palette, Hammer, BookOpen, Lock } from 'lucide-react';
 
 export const Task6_FinalAssembly: React.FC = () => {
   const { state, updateTask6Roles } = useProject();

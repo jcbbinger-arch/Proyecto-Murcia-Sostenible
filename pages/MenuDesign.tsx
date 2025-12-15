@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, DishType, IngredientRow } from '../types';
 import { ALLERGENS } from '../constants';
-import { Plus, Trash2, Edit2, Upload, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock } from 'lucide-react';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
