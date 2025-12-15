@@ -31,12 +31,21 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<ProjectState>(() => {
-    const saved = localStorage.getItem('murcia_project_data');
-    return saved ? JSON.parse(saved) : INITIAL_STATE;
+    try {
+      const saved = localStorage.getItem('murcia_project_data');
+      return saved ? JSON.parse(saved) : INITIAL_STATE;
+    } catch (error) {
+      console.error("Error loading project data from local storage, resetting to default.", error);
+      return INITIAL_STATE;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('murcia_project_data', JSON.stringify(state));
+    try {
+      localStorage.setItem('murcia_project_data', JSON.stringify(state));
+    } catch (error) {
+      console.error("Error saving project data to local storage", error);
+    }
   }, [state]);
 
   const setCurrentUser = (id: string | null) => {
@@ -214,6 +223,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   const resetProject = () => {
     if(confirm("¿Estás seguro de borrar todo el progreso?")) {
         setState(INITIAL_STATE);
+        localStorage.removeItem('murcia_project_data');
     }
   };
 
