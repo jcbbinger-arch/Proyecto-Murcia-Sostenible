@@ -13,34 +13,35 @@ Cuando te pregunten:
 4. No hagas el trabajo por ellos, guíalos para que aprendan.
 `;
 
-// Lazy initialization holder
 let ai: GoogleGenAI | null = null;
 
 const getAiInstance = () => {
-  if (!ai) {
-    // We access process.env only when the function is called, not at module level
-    // This prevents "process is not defined" errors from crashing the whole app on startup
-    try {
-      ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-    } catch (e) {
-      console.error("Failed to initialize Gemini Client", e);
+  if (ai) return ai;
+
+  const apiKey = process.env.API_KEY;
+  if (!apiKey || apiKey.length < 5) {
+      console.warn("Gemini API Key is missing or invalid");
       return null;
-    }
   }
-  return ai;
+
+  try {
+    ai = new GoogleGenAI({ apiKey });
+    return ai;
+  } catch (e) {
+    console.error("Failed to initialize Gemini Client", e);
+    return null;
+  }
 };
 
 export const sendMessageToGemini = async (message: string): Promise<string> => {
   try {
     const client = getAiInstance();
     if (!client) {
-      return "Error de configuración: No se pudo iniciar el asistente de IA.";
+      return "⚠️ No puedo conectar con el servidor de IA. Por favor, asegúrate de que la API Key está configurada correctamente en el archivo .env.";
     }
 
-    const model = 'gemini-2.5-flash';
-    
     const response = await client.models.generateContent({
-      model: model,
+      model: 'gemini-2.5-flash',
       contents: message,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
@@ -48,9 +49,9 @@ export const sendMessageToGemini = async (message: string): Promise<string> => {
       }
     });
 
-    return response.text || "Lo siento, no pude generar una respuesta.";
+    return response.text || "Lo siento, recibí una respuesta vacía.";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "Ocurrió un error al conectar con el asistente virtual.";
+    return "Ocurrió un error temporal al conectar con el asistente. Por favor, inténtalo de nuevo en unos segundos.";
   }
 };

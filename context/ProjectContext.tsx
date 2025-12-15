@@ -29,11 +29,32 @@ interface ProjectContextType {
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
+// Helper to ensure loaded data has all required fields from INITIAL_STATE
+const sanitizeState = (loadedData: any): ProjectState => {
+    if (!loadedData) return INITIAL_STATE;
+    
+    // Deep merge strategy for critical sections to avoid "undefined" errors
+    // if we add new properties in the future
+    return {
+        ...INITIAL_STATE,
+        ...loadedData,
+        concept: { ...INITIAL_STATE.concept, ...(loadedData.concept || {}) },
+        missions: { ...INITIAL_STATE.missions, ...(loadedData.missions || {}) },
+        task2: { ...INITIAL_STATE.task2, ...(loadedData.task2 || {}) },
+        task6: { ...INITIAL_STATE.task6, ...(loadedData.task6 || {}) },
+        menuPrototype: { ...INITIAL_STATE.menuPrototype, ...(loadedData.menuPrototype || {}) },
+        // Arrays are replaced, not merged, to avoid duplication issues, 
+        // but we default to empty array if missing
+        dishes: Array.isArray(loadedData.dishes) ? loadedData.dishes : [],
+        team: Array.isArray(loadedData.team) ? loadedData.team : []
+    };
+};
+
 export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<ProjectState>(() => {
     try {
       const saved = localStorage.getItem('murcia_project_data');
-      return saved ? JSON.parse(saved) : INITIAL_STATE;
+      return saved ? sanitizeState(JSON.parse(saved)) : INITIAL_STATE;
     } catch (error) {
       console.error("Error loading project data from local storage, resetting to default.", error);
       return INITIAL_STATE;
@@ -53,7 +74,9 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const importProjectData = (data: ProjectState) => {
-    setState({ ...data, currentUser: state.currentUser }); // Keep current user session if possible
+    // Sanitize incoming data too
+    const cleanData = sanitizeState(data);
+    setState({ ...cleanData, currentUser: state.currentUser }); 
   };
 
   const mergeContribution = (incomingState: ProjectState, memberId: string) => {
@@ -64,51 +87,54 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
           const newState = { ...current };
 
           // 1. Merge Task 2 (Analysis)
-          newState.task2.tasks = current.task2.tasks.map(currentTask => {
-              if (currentTask.assignedToId === memberId) {
-                  // Find the version in incoming state
-                  const incomingTask = incomingState.task2.tasks.find(t => t.id === currentTask.id);
-                  if (incomingTask) {
-                      return incomingTask; // Overwrite with incoming
-                  }
-              }
-              return currentTask; // Keep existing
-          });
+          if (incomingState.task2 && Array.isArray(incomingState.task2.tasks)) {
+             newState.task2.tasks = current.task2.tasks.map(currentTask => {
+                if (currentTask.assignedToId === memberId) {
+                    // Find the version in incoming state
+                    const incomingTask = incomingState.task2.tasks.find(t => t.id === currentTask.id);
+                    if (incomingTask) {
+                        return incomingTask; // Overwrite with incoming
+                    }
+                }
+                return currentTask; // Keep existing
+            });
+          }
 
           // 2. Merge Dishes
           // We look for the dishes in incomingState that belong to memberId
-          const incomingDishes = incomingState.dishes.filter(d => d.author === memberId);
-          
-          // We replace the dishes in current state that match the IDs of incoming dishes
-          // or add them if they are new (though in this workflow they should be pre-created)
-          let updatedDishes = [...current.dishes];
-          
-          incomingDishes.forEach(inDish => {
-              const index = updatedDishes.findIndex(d => d.id === inDish.id);
-              if (index !== -1) {
-                  updatedDishes[index] = inDish;
-              } else {
-                  updatedDishes.push(inDish);
-              }
-          });
-          newState.dishes = updatedDishes;
+          if (Array.isArray(incomingState.dishes)) {
+              const incomingDishes = incomingState.dishes.filter(d => d.author === memberId);
+              
+              let updatedDishes = [...current.dishes];
+              incomingDishes.forEach(inDish => {
+                  const index = updatedDishes.findIndex(d => d.id === inDish.id);
+                  if (index !== -1) {
+                      updatedDishes[index] = inDish;
+                  } else {
+                      updatedDishes.push(inDish);
+                  }
+              });
+              newState.dishes = updatedDishes;
+          }
 
           // 3. Merge Task 6 Roles work (if applicable)
-          // If this member is the Designer (6.A), merge menuPrototype digital parts
-          if (current.task6.designerId === memberId) {
-               newState.menuPrototype = {
-                   ...newState.menuPrototype,
-                   digitalLink: incomingState.menuPrototype.digitalLink
-               };
-          }
-          // If this member is the Artisan (6.B), merge menuPrototype physical parts
-           if (current.task6.artisanId === memberId) {
-               newState.menuPrototype = {
-                   ...newState.menuPrototype,
-                   physicalPhoto: incomingState.menuPrototype.physicalPhoto,
-                   physicalDescription: incomingState.menuPrototype.physicalDescription,
-                   generalStyle: incomingState.menuPrototype.generalStyle
-               };
+          if (incomingState.menuPrototype) {
+              // If this member is the Designer (6.A), merge menuPrototype digital parts
+              if (current.task6.designerId === memberId) {
+                   newState.menuPrototype = {
+                       ...newState.menuPrototype,
+                       digitalLink: incomingState.menuPrototype.digitalLink || newState.menuPrototype.digitalLink
+                   };
+              }
+              // If this member is the Artisan (6.B), merge menuPrototype physical parts
+               if (current.task6.artisanId === memberId) {
+                   newState.menuPrototype = {
+                       ...newState.menuPrototype,
+                       physicalPhoto: incomingState.menuPrototype.physicalPhoto || newState.menuPrototype.physicalPhoto,
+                       physicalDescription: incomingState.menuPrototype.physicalDescription || newState.menuPrototype.physicalDescription,
+                       generalStyle: incomingState.menuPrototype.generalStyle || newState.menuPrototype.generalStyle
+                   };
+              }
           }
 
           return newState;
@@ -174,7 +200,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   const createPlaceholderDishes = (assignments: { type: DishType, authorId: string, name: string }[]) => {
       const newDishes: Dish[] = assignments.map((assign) => ({
         id: Math.random().toString(36).substr(2, 9),
-        name: assign.name, // Use placeholder name or real name
+        name: assign.name, 
         type: assign.type,
         servings: 1,
         photo: null,
@@ -190,7 +216,6 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
         author: assign.authorId
       }));
 
-      // Replace all existing dishes with these new placeholders to start fresh structure
       setState(prev => ({ ...prev, dishes: newDishes }));
   };
 
@@ -199,7 +224,6 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const updateDish = (dish: Dish) => {
-    // Keep original author if editing
     setState(prev => ({
         ...prev,
         dishes: prev.dishes.map(d => d.id === dish.id ? dish : d)
@@ -221,9 +245,10 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   }
 
   const resetProject = () => {
-    if(confirm("¿Estás seguro de borrar todo el progreso?")) {
-        setState(INITIAL_STATE);
+    if(confirm("¿Estás seguro de borrar todo el progreso? Esta acción no se puede deshacer.")) {
         localStorage.removeItem('murcia_project_data');
+        setState(INITIAL_STATE);
+        window.location.reload();
     }
   };
 
