@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, IngredientRow } from '../types';
-import { DollarSign, BookOpen, Calculator, Save, AlertTriangle } from 'lucide-react';
+import { BookOpen, Calculator, Save } from 'lucide-react';
 
 export const Task5_Financials: React.FC = () => {
   const { state, updateDish } = useProject();

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Palette, ExternalLink, Image as ImageIcon, Upload, PenTool, Layout } from 'lucide-react';
+import { Palette, ExternalLink, Upload, PenTool, Layout } from 'lucide-react';
 
 export const Task4_MenuPrototype: React.FC = () => {
   const { state, updateMenuPrototype } = useProject();

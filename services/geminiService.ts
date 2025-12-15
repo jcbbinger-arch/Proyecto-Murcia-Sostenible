@@ -15,11 +15,11 @@ Cuando te pregunten:
 4. No hagas el trabajo por ellos, guíalos para que aprendan.
 `;
 
-export const sendMessageToGemini = async (message: string, history: string[] = []): Promise<string> => {
+export const sendMessageToGemini = async (message: string): Promise<string> => {
   try {
     const model = 'gemini-2.5-flash';
     
-    // Construct a simple prompt with history context if needed, 
+    // Construct a simple prompt, 
     // but for simplicity in this stateless service, we'll just send the current message 
     // combined with the system instruction context implicitly handled by the model config if we were using chat sessions.
     // For single turn requests:
