@@ -1,7 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const SYSTEM_INSTRUCTION = `Eres un consultor gastronómico experto y mentor para estudiantes de hostelería en la Región de Murcia. 
 Estás ayudando a un equipo de alumnos con su proyecto final "Murcia Sostenible".
 Su objetivo es crear un restaurante sostenible.
@@ -15,16 +13,33 @@ Cuando te pregunten:
 4. No hagas el trabajo por ellos, guíalos para que aprendan.
 `;
 
+// Lazy initialization holder
+let ai: GoogleGenAI | null = null;
+
+const getAiInstance = () => {
+  if (!ai) {
+    // We access process.env only when the function is called, not at module level
+    // This prevents "process is not defined" errors from crashing the whole app on startup
+    try {
+      ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    } catch (e) {
+      console.error("Failed to initialize Gemini Client", e);
+      return null;
+    }
+  }
+  return ai;
+};
+
 export const sendMessageToGemini = async (message: string): Promise<string> => {
   try {
+    const client = getAiInstance();
+    if (!client) {
+      return "Error de configuración: No se pudo iniciar el asistente de IA.";
+    }
+
     const model = 'gemini-2.5-flash';
     
-    // Construct a simple prompt, 
-    // but for simplicity in this stateless service, we'll just send the current message 
-    // combined with the system instruction context implicitly handled by the model config if we were using chat sessions.
-    // For single turn requests:
-    
-    const response = await ai.models.generateContent({
+    const response = await client.models.generateContent({
       model: model,
       contents: message,
       config: {
