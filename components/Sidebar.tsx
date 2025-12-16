@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home } from 'lucide-react';
+import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap } from 'lucide-react';
 import { useProject } from '../context/ProjectContext';
 
 export const Sidebar: React.FC = () => {
@@ -8,6 +8,7 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { to: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Panel Principal" },
+    { to: "/academic-guide", icon: <GraduationCap size={20} />, label: "Guía Académica (RA/ODS)" },
     { to: "/task-1", icon: <Users size={20} />, label: "1. Equipo y Zona" },
     { to: "/setup", icon: <Settings size={20} />, label: "2. Reparto Global" },
     { to: "/sync", icon: <Share2 size={20} />, label: "Sincronización" },

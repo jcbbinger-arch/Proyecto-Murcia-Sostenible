@@ -15,6 +15,7 @@ import { Task5_Financials } from './pages/Task5_Financials';
 import { Task6_FinalAssembly } from './pages/Task6_FinalAssembly';
 import { TeamSync } from './pages/TeamSync';
 import { FinalMemory } from './pages/FinalMemory';
+import { AcademicGuide } from './pages/AcademicGuide';
 
 // Layout wrapper to conditionally show Sidebar and Chat
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -42,6 +43,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/academic-guide" element={<AcademicGuide />} />
             <Route path="/task-1" element={<Task1_TeamZone />} />
             <Route path="/setup" element={<ProjectSetup />} />
             <Route path="/sync" element={<TeamSync />} />
