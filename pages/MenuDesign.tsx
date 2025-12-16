@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, DishType, IngredientRow } from '../types';
 import { ALLERGENS } from '../constants';
-import { Plus, Trash2, Edit2, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock, User } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock, User, ShieldCheck } from 'lucide-react';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -30,6 +30,8 @@ export const MenuDesign: React.FC = () => {
     priceJustification: '',
     author: ''
   });
+
+  const isCoordinator = state.team.find(m => m.id === state.currentUser)?.isCoordinator;
 
   const handleSaveDish = () => {
     if (!newDish.name) return alert("El nombre del plato es obligatorio");
@@ -184,6 +186,10 @@ export const MenuDesign: React.FC = () => {
                         <li>1 Postre</li>
                     </ul>
                 </div>
+                <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
+                    <h4 className="font-bold text-green-900 mt-0">Revisión del Coordinador</h4>
+                    <p className="text-sm">El coordinador tiene acceso de edición a <strong>todas las fichas</strong> para poder revisar, corregir y homogeneizar el estilo antes de la entrega final.</p>
+                </div>
             </div>
             
             <div className="mt-6 flex justify-center">
@@ -240,18 +246,31 @@ export const MenuDesign: React.FC = () => {
                 ))}
             </div>
 
-            <h3 className="text-lg font-bold text-gray-700 mt-6 pt-4 border-t">Platos del Equipo</h3>
-             <div className="space-y-3 opacity-70">
+            <h3 className="text-lg font-bold text-gray-700 mt-6 pt-4 border-t flex items-center gap-2">
+                {isCoordinator ? <ShieldCheck size={20} className="text-blue-600" /> : null} 
+                Platos del Equipo {isCoordinator && "(Modo Revisión)"}
+            </h3>
+             <div className="space-y-3 opacity-90">
                 {state.dishes.filter(d => d.author !== state.currentUser).map((dish) => {
                     const authorName = state.team.find(m => m.id === dish.author)?.name || 'Otro';
                     return (
-                        <div key={dish.id} className="p-3 rounded-xl border bg-gray-50 flex gap-3">
-                             <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0"></div>
+                        <div 
+                            key={dish.id} 
+                            onClick={isCoordinator ? () => handleEditClick(dish) : undefined}
+                            className={`p-3 rounded-xl border flex gap-3 ${isCoordinator ? 'bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100' : 'bg-gray-50 cursor-not-allowed'}`}
+                        >
+                             <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
+                                {dish.photo && <img src={dish.photo} className="w-full h-full object-cover"/>}
+                             </div>
                              <div className="flex-1 min-w-0">
                                 <h4 className="font-bold text-gray-600 text-xs truncate">{dish.name}</h4>
                                 <p className="text-[10px] text-gray-400">Chef: {authorName}</p>
                              </div>
-                             <Lock size={14} className="text-gray-300" />
+                             {isCoordinator ? (
+                                <Edit2 size={14} className="text-blue-400" />
+                             ) : (
+                                <Lock size={14} className="text-gray-300" />
+                             )}
                         </div>
                     )
                 })}
@@ -269,8 +288,11 @@ export const MenuDesign: React.FC = () => {
             ) : (
                 <>
                 <div className="bg-gray-50 p-4 border-b flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-gray-800">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         {isEditing === 'NEW' ? 'Creando Nuevo Plato' : `Editando: ${newDish.name}`}
+                        {isEditing !== 'NEW' && newDish.author !== state.currentUser && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded border border-blue-200">Revisión de Coordinador</span>
+                        )}
                     </h3>
                     <div className="flex space-x-2">
                         {[1, 2, 3].map(step => (

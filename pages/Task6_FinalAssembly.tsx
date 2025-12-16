@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Palette, Hammer, BookOpen, Lock } from 'lucide-react';
+import { Palette, Hammer, BookOpen, Lock, UserCheck } from 'lucide-react';
 
 export const Task6_FinalAssembly: React.FC = () => {
   const { state, updateTask6Roles } = useProject();
   const [activeTab, setActiveTab] = useState<'instructions' | 'roles'>('instructions');
 
   const isCoordinator = state.currentUser ? state.team.find(m => m.id === state.currentUser)?.isCoordinator : true;
+  const coordinatorMember = state.team.find(m => m.isCoordinator);
+  const teamMembers = state.team.filter(m => !m.isCoordinator);
 
   const toggleRole = (roleType: 'designerIds' | 'artisanIds' | 'editorIds', memberId: string) => {
       if (!isCoordinator) return;
@@ -82,6 +84,21 @@ export const Task6_FinalAssembly: React.FC = () => {
                     : "Solo lectura. Tu rol ha sido asignado por el Coordinador."}
                 </p>
 
+                {/* COORDINATOR ROLE CARD */}
+                <div className="mb-8 border-b pb-8">
+                    <div className="p-4 bg-indigo-50 rounded border border-indigo-200 flex items-start gap-4">
+                        <div className="p-2 bg-indigo-100 rounded-full text-indigo-700">
+                            <UserCheck size={24} />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-indigo-900 text-lg">Dirección y Ensamblaje: {coordinatorMember?.name || 'Sin asignar'}</h4>
+                            <p className="text-sm text-indigo-800 mt-1">
+                                El Coordinador es responsable de ensamblar todas las partes, supervisar el trabajo de los especialistas y asegurar la entrega final. <strong>No participa en las subtareas específicas.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Role A */}
                     <div className="p-4 bg-purple-50 rounded border border-purple-100">
@@ -90,7 +107,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
                         </div>
                         <div className="space-y-2">
-                             {state.team.map(m => (
+                             {teamMembers.map(m => (
                                 <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-purple-100 cursor-pointer' : ''}`}>
                                     <input 
                                         type="checkbox"
@@ -102,6 +119,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                                     {m.name}
                                 </label>
                             ))}
+                            {teamMembers.length === 0 && <span className="text-xs text-gray-400 italic">No hay otros miembros.</span>}
                         </div>
                     </div>
 
@@ -112,7 +130,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
                         </div>
                         <div className="space-y-2">
-                             {state.team.map(m => (
+                             {teamMembers.map(m => (
                                 <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-orange-100 cursor-pointer' : ''}`}>
                                     <input 
                                         type="checkbox"
@@ -124,6 +142,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                                     {m.name}
                                 </label>
                             ))}
+                            {teamMembers.length === 0 && <span className="text-xs text-gray-400 italic">No hay otros miembros.</span>}
                         </div>
                     </div>
 
@@ -134,7 +153,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
                         </div>
                         <div className="space-y-2">
-                             {state.team.map(m => (
+                             {teamMembers.map(m => (
                                 <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-blue-100 cursor-pointer' : ''}`}>
                                     <input 
                                         type="checkbox"
@@ -146,6 +165,7 @@ export const Task6_FinalAssembly: React.FC = () => {
                                     {m.name}
                                 </label>
                             ))}
+                            {teamMembers.length === 0 && <span className="text-xs text-gray-400 italic">No hay otros miembros.</span>}
                         </div>
                     </div>
                 </div>

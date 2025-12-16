@@ -1,6 +1,6 @@
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Settings, Save, Download, AlertTriangle } from 'lucide-react';
+import { Settings, Save, Download, AlertTriangle, UserCheck } from 'lucide-react';
 
 export const ProjectSetup: React.FC = () => {
   const { 
@@ -29,6 +29,9 @@ export const ProjectSetup: React.FC = () => {
     link.download = `murcia_proyecto_MASTER_${state.teamName.replace(/\s+/g, '_')}_config.json`;
     link.click();
   };
+
+  const coordinator = state.team.find(m => m.isCoordinator);
+  const teamMembers = state.team.filter(m => !m.isCoordinator);
 
   if(state.team.length === 0) {
       return (
@@ -88,14 +91,25 @@ export const ProjectSetup: React.FC = () => {
           {/* SECTION 3: ROLES TASK 6 */}
           <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="text-xl font-bold text-purple-900 mb-4">3. Roles Finales (Tarea 6)</h3>
-              <p className="text-sm text-gray-500 mb-4">Asigna las responsabilidades de producción final. Puedes seleccionar a <strong>varias personas</strong> por rol.</p>
+              
+              <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6 flex items-start gap-3">
+                  <UserCheck className="text-indigo-600 mt-1" />
+                  <div>
+                      <h4 className="font-bold text-indigo-900">Rol del Coordinador: {coordinator?.name || 'No asignado'}</h4>
+                      <p className="text-sm text-indigo-700">
+                          El coordinador <strong>no participa</strong> en estos roles específicos, ya que su función es <strong>ensamblar todo el proyecto</strong>, supervisar la coherencia y gestionar la entrega final.
+                      </p>
+                  </div>
+              </div>
+
+              <p className="text-sm text-gray-500 mb-4">Asigna las responsabilidades de producción final al resto del equipo. Puedes seleccionar a <strong>varias personas</strong> por rol.</p>
               
               <div className="grid md:grid-cols-3 gap-6">
                   {/* Designer */}
                   <div className="p-4 bg-purple-50 rounded border border-purple-200">
                       <h4 className="font-bold text-purple-900 text-sm mb-3">Diseñadores Gráficos (Digital)</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {state.team.map(m => (
+                        {teamMembers.map(m => (
                             <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-purple-100 p-1 rounded">
                                 <input 
                                     type="checkbox"
@@ -106,6 +120,7 @@ export const ProjectSetup: React.FC = () => {
                                 {m.name}
                             </label>
                         ))}
+                        {teamMembers.length === 0 && <p className="text-xs text-gray-400">No hay miembros disponibles.</p>}
                       </div>
                   </div>
 
@@ -113,7 +128,7 @@ export const ProjectSetup: React.FC = () => {
                   <div className="p-4 bg-orange-50 rounded border border-orange-200">
                       <h4 className="font-bold text-orange-900 text-sm mb-3">Artesanos (Físico)</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {state.team.map(m => (
+                        {teamMembers.map(m => (
                             <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-orange-100 p-1 rounded">
                                 <input 
                                     type="checkbox"
@@ -124,6 +139,7 @@ export const ProjectSetup: React.FC = () => {
                                 {m.name}
                             </label>
                         ))}
+                         {teamMembers.length === 0 && <p className="text-xs text-gray-400">No hay miembros disponibles.</p>}
                       </div>
                   </div>
 
@@ -131,7 +147,7 @@ export const ProjectSetup: React.FC = () => {
                   <div className="p-4 bg-blue-50 rounded border border-blue-200">
                       <h4 className="font-bold text-blue-900 text-sm mb-3">Editores Jefes (Memoria)</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {state.team.map(m => (
+                        {teamMembers.map(m => (
                             <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-blue-100 p-1 rounded">
                                 <input 
                                     type="checkbox"
@@ -142,6 +158,7 @@ export const ProjectSetup: React.FC = () => {
                                 {m.name}
                             </label>
                         ))}
+                         {teamMembers.length === 0 && <p className="text-xs text-gray-400">No hay miembros disponibles.</p>}
                       </div>
                   </div>
               </div>
