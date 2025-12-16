@@ -121,25 +121,17 @@ export const AcademicGuide: React.FC = () => {
     }
   ];
 
-  const ODS_LIST = [
-    { id: 1, text: "Poner fin a la pobreza en todas sus formas en todo el mundo", color: "bg-red-500" },
-    { id: 2, text: "Poner fin al hambre, lograr la seguridad alimentaria y la mejora de la nutrición y promover la agricultura sostenible", color: "bg-yellow-500" },
-    { id: 3, text: "Garantizar una vida sana y promover el bienestar para todos en todas las edades", color: "bg-green-500" },
-    { id: 4, text: "Garantizar una educación inclusiva, equitativa y de calidad y promover oportunidades de aprendizaje durante toda la vida para todos", color: "bg-red-700" },
-    { id: 5, text: "Lograr la igualdad entre los géneros y empoderar a todas las mujeres y las niñas", color: "bg-orange-500" },
-    { id: 6, text: "Garantizar la disponibilidad de agua y su gestión sostenible y el saneamiento para todos", color: "bg-cyan-500" },
-    { id: 7, text: "Garantizar el acceso a una energía asequible, segura, sostenible y moderna para todos", color: "bg-yellow-400" },
-    { id: 8, text: "Promover el crecimiento económico sostenido, inclusivo y sostenible, el empleo pleno y productivo y el trabajo decente para todos", color: "bg-red-800" },
-    { id: 9, text: "Construir infraestructuras resilientes, promover la industrialización inclusiva y sostenible y fomentar la innovación", color: "bg-orange-600" },
-    { id: 10, text: "Reducir la desigualdad en y entre los países", color: "bg-pink-500" },
-    { id: 11, text: "Lograr que las ciudades y los asentamientos humanos sean inclusivos, seguros, resilientes y sostenibles", color: "bg-yellow-600" },
-    { id: 12, text: "Garantizar modalidades de consumo y producción sostenibles", color: "bg-yellow-700" },
-    { id: 13, text: "Adoptar medidas urgentes para combatir el cambio climático y sus efectos", color: "bg-green-700" },
-    { id: 14, text: "Conservar y utilizar en forma sostenible los océanos, los mares y los recursos marinos para el desarrollo sostenible", color: "bg-blue-500" },
-    { id: 15, text: "Gestionar sosteniblemente los bosques, luchar contra la desertificación, detener e invertir la degradación de las tierras y detener la pérdida de biodiversidad", color: "bg-green-600" },
-    { id: 16, text: "Promover sociedades justas, pacíficas e inclusivas", color: "bg-blue-700" },
-    { id: 17, text: "Revitalizar la Alianza Mundial para el Desarrollo Sostenible", color: "bg-blue-900" }
-  ];
+  // Helper function to generate official UN ODS image URLs
+  const getODSImage = (id: number) => {
+      const paddedId = id < 10 ? `0${id}` : `${id}`;
+      // Official UN Spanish icons URL pattern
+      return `https://www.un.org/sustainabledevelopment/es/wp-content/uploads/sites/3/2018/08/S_SDG_goals_icons-individual-rgb-${paddedId}.png`;
+  };
+
+  const ODS_LIST = Array.from({ length: 17 }, (_, i) => ({
+      id: i + 1,
+      image: getODSImage(i + 1)
+  }));
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -255,11 +247,15 @@ export const AcademicGuide: React.FC = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {ODS_LIST.map((ods) => (
-                    <div key={ods.id} className={`${ods.color} text-white p-4 rounded-xl shadow-md hover:scale-105 transition-transform flex flex-col justify-between min-h-[140px]`}>
-                        <div className="text-4xl font-black opacity-30 mb-2">{ods.id}</div>
-                        <p className="font-bold text-sm leading-tight">{ods.text}</p>
+                    <div key={ods.id} className="group cursor-pointer">
+                        <img 
+                            src={ods.image} 
+                            alt={`ODS ${ods.id}`} 
+                            className="w-full h-auto rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                        />
                     </div>
                 ))}
             </div>
@@ -267,10 +263,14 @@ export const AcademicGuide: React.FC = () => {
             <div className="mt-8 bg-white p-6 rounded-xl border border-gray-200 text-center">
                 <Target size={48} className="mx-auto text-green-600 mb-4" />
                 <h4 className="text-lg font-bold text-gray-800 mb-2">¿Cómo aplicar los ODS a mi restaurante?</h4>
-                <p className="text-gray-600 text-sm max-w-2xl mx-auto">
-                    Por ejemplo: Al usar productos de Km0 impactas en el <strong>ODS 12 (Consumo Responsable)</strong> y <strong>ODS 13 (Acción por el Clima)</strong>. 
-                    Al diseñar menús saludables, trabajas el <strong>ODS 3 (Salud y Bienestar)</strong>.
+                <p className="text-gray-600 text-sm max-w-2xl mx-auto mb-4">
+                    <strong>ODS 12 (Consumo Responsable):</strong> Usa productos de Km0 y minimiza desperdicios.<br/>
+                    <strong>ODS 3 (Salud y Bienestar):</strong> Diseña menús equilibrados nutricionalmente.<br/>
+                    <strong>ODS 8 (Trabajo Decente):</strong> Planifica condiciones laborales justas en tu análisis de RRHH.
                 </p>
+                <a href="https://ods.uam.es/agenda-2030-y-ods/" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs">
+                    Ver fuente oficial (UAM)
+                </a>
             </div>
         </div>
       )}

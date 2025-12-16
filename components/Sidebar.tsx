@@ -1,83 +1,139 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap } from 'lucide-react';
+import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool } from 'lucide-react';
 import { useProject } from '../context/ProjectContext';
 
 export const Sidebar: React.FC = () => {
   const { state, resetProject } = useProject();
 
-  const navItems = [
-    { to: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Panel Principal" },
-    { to: "/academic-guide", icon: <GraduationCap size={20} />, label: "Guía Académica (RA/ODS)" },
-    { to: "/task-1", icon: <Users size={20} />, label: "1. Equipo y Zona" },
-    { to: "/setup", icon: <Settings size={20} />, label: "2. Reparto Global" },
-    { to: "/sync", icon: <Share2 size={20} />, label: "Sincronización" },
-    { to: "/task-2", icon: <Microscope size={20} />, label: "3. Análisis" },
-    { to: "/menu", icon: <UtensilsCrossed size={20} />, label: "4. Carta" },
-    { to: "/task-4", icon: <Palette size={20} />, label: "5. Prototipos" },
-    { to: "/financials", icon: <DollarSign size={20} />, label: "6. Viabilidad" },
-    { to: "/task-6", icon: <Rocket size={20} />, label: "7. Producción Final" },
-    { to: "/memory", icon: <Printer size={20} />, label: "Memoria Final" },
+  const creationItems = [
+    { to: "/task-1", icon: <Users size={18} />, label: "1. Equipo y Zona" },
+    { to: "/setup", icon: <Settings size={18} />, label: "2. Reparto Global" },
+    { to: "/sync", icon: <Share2 size={18} />, label: "Sincronización" },
   ];
+
+  const executionItems = [
+    { to: "/task-2", icon: <Microscope size={18} />, label: "3. Análisis" },
+    { to: "/menu", icon: <UtensilsCrossed size={18} />, label: "4. Carta" },
+    { to: "/task-4", icon: <Palette size={18} />, label: "5. Prototipos" },
+    { to: "/financials", icon: <DollarSign size={18} />, label: "6. Viabilidad" },
+    { to: "/task-6", icon: <Rocket size={18} />, label: "7. Producción Final" },
+    { to: "/memory", icon: <Printer size={18} />, label: "Memoria Final" },
+  ];
+
+  const NavItem = ({ to, icon, label, colorClass }: { to: string, icon: React.ReactNode, label: string, colorClass: string }) => (
+      <NavLink
+        to={to}
+        className={({ isActive }) =>
+          `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1 ${
+            isActive
+              ? colorClass
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`
+        }
+      >
+        {icon}
+        {label}
+      </NavLink>
+  );
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 no-print z-10">
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-5 border-b border-gray-100 bg-gray-50">
         <Link to="/" className="text-xl font-bold text-green-800 flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <FileText className="text-green-600"/>
+            <FileText className="text-green-600" size={24}/>
             Murcia Sostenible
         </Link>
-        <p className="text-xs text-gray-500 mt-2">Gestor de Proyecto</p>
+        <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-bold">Gestor de Proyecto</p>
         {state.currentUser && (
-            <div className="mt-2 bg-green-50 text-green-800 px-2 py-1 rounded text-xs font-bold truncate">
-                Hola, {state.team.find(m => m.id === state.currentUser)?.name || 'Usuario'}
+            <div className="mt-2 bg-white border border-green-200 text-green-800 px-2 py-1.5 rounded text-xs font-bold truncate flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                {state.team.find(m => m.id === state.currentUser)?.name || 'Usuario'}
             </div>
         )}
       </div>
 
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        <NavLink
-            to="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-            <Home size={20} />
-            Volver a Portada
-        </NavLink>
-        
-        <div className="my-2 border-t border-gray-100"></div>
+      <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+        {/* General */}
+        <div>
+            <NavItem 
+                to="/dashboard" 
+                icon={<LayoutDashboard size={18} />} 
+                label="Panel Principal" 
+                colorClass="bg-gray-100 text-gray-900 font-bold"
+            />
+             <NavItem 
+                to="/academic-guide" 
+                icon={<GraduationCap size={18} />} 
+                label="Guía Académica" 
+                colorClass="bg-yellow-50 text-yellow-800 border border-yellow-200"
+            />
+        </div>
 
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-green-50 text-green-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
-        ))}
+        {/* Phase 1: Creation (Blue) */}
+        <div>
+            <h4 className="text-[10px] uppercase font-bold text-blue-800 mb-2 px-2 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                Fase 1: Configuración
+            </h4>
+            <div className="border-l-2 border-blue-100 pl-2 ml-1">
+                {creationItems.map(item => (
+                    <NavItem 
+                        key={item.to} 
+                        to={item.to}
+                        icon={item.icon}
+                        label={item.label}
+                        colorClass="bg-blue-50 text-blue-700 border border-blue-100"
+                    />
+                ))}
+            </div>
+        </div>
+
+        {/* Phase 2: Execution (Green) */}
+        <div>
+            <h4 className="text-[10px] uppercase font-bold text-green-800 mb-2 px-2 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                Fase 2: Ejecución
+            </h4>
+            <div className="border-l-2 border-green-100 pl-2 ml-1">
+                {executionItems.map(item => (
+                    <NavItem 
+                        key={item.to} 
+                        to={item.to}
+                        icon={item.icon}
+                        label={item.label}
+                        colorClass="bg-green-50 text-green-700 border border-green-100"
+                    />
+                ))}
+            </div>
+        </div>
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
-        <div className="bg-green-50 rounded-lg p-3 mb-4">
-            <p className="text-xs font-semibold text-green-800 uppercase mb-1">Progreso</p>
-            <div className="text-xs text-green-700">
-                Equipo: {state.teamName ? '✅' : '❌'}<br/>
-                Carta: {state.dishes.length}/4<br/>
-                Memoria: {state.task6.editorId ? 'En proceso' : 'Pendiente'}<br/>
+      <div className="p-4 border-t border-gray-100 bg-gray-50">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 mb-3 shadow-sm">
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Estado del Proyecto</p>
+            <div className="text-xs text-gray-600 space-y-1">
+                <div className="flex justify-between">
+                    <span>Equipo:</span>
+                    <span>{state.teamName ? '✅' : 'Wait...'}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span>Carta:</span>
+                    <span>{state.dishes.length}/4</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                    <div 
+                        className="bg-green-500 h-1.5 rounded-full transition-all duration-1000" 
+                        style={{ width: `${Math.min(100, (state.dishes.length / 4) * 100)}%` }}
+                    ></div>
+                </div>
             </div>
         </div>
         <button 
             onClick={resetProject}
-            className="w-full text-xs text-red-500 hover:text-red-700 underline text-center"
+            className="w-full text-[10px] text-red-400 hover:text-red-600 hover:underline text-center"
         >
-            Borrar datos y reiniciar
+            Reiniciar Proyecto
         </button>
       </div>
     </aside>
