@@ -19,7 +19,6 @@ interface ProjectContextType {
   updateConcept: (key: keyof ProjectState['concept'], value: any) => void;
   updateMission: (role: keyof ProjectState['missions'], data: any) => void;
   addDish: (dish: Dish) => void;
-  updateDishDistribution: (assignments: { type: DishType, authorId: string, name: string }[]) => void;
   removeDish: (id: string) => void;
   updateDish: (dish: Dish) => void;
   updateMenuPrototype: (data: Partial<MenuPrototype>) => void;
@@ -34,17 +33,20 @@ const sanitizeState = (loadedData: any): ProjectState => {
     if (!loadedData) return INITIAL_STATE;
     
     // Deep merge strategy for critical sections to avoid "undefined" errors
-    // if we add new properties in the future
+    const safeTask6 = { 
+        designerIds: loadedData.task6?.designerIds || loadedData.task6?.designerId ? (Array.isArray(loadedData.task6?.designerIds) ? loadedData.task6.designerIds : [loadedData.task6?.designerId].filter(Boolean)) : [],
+        artisanIds: loadedData.task6?.artisanIds || loadedData.task6?.artisanId ? (Array.isArray(loadedData.task6?.artisanIds) ? loadedData.task6.artisanIds : [loadedData.task6?.artisanId].filter(Boolean)) : [],
+        editorIds: loadedData.task6?.editorIds || loadedData.task6?.editorId ? (Array.isArray(loadedData.task6?.editorIds) ? loadedData.task6.editorIds : [loadedData.task6?.editorId].filter(Boolean)) : []
+    };
+
     return {
         ...INITIAL_STATE,
         ...loadedData,
         concept: { ...INITIAL_STATE.concept, ...(loadedData.concept || {}) },
         missions: { ...INITIAL_STATE.missions, ...(loadedData.missions || {}) },
         task2: { ...INITIAL_STATE.task2, ...(loadedData.task2 || {}) },
-        task6: { ...INITIAL_STATE.task6, ...(loadedData.task6 || {}) },
+        task6: safeTask6,
         menuPrototype: { ...INITIAL_STATE.menuPrototype, ...(loadedData.menuPrototype || {}) },
-        // Arrays are replaced, not merged, to avoid duplication issues, 
-        // but we default to empty array if missing
         dishes: Array.isArray(loadedData.dishes) ? loadedData.dishes : [],
         team: Array.isArray(loadedData.team) ? loadedData.team : []
     };
@@ -80,9 +82,6 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const mergeContribution = (incomingState: ProjectState, memberId: string) => {
-      // Logic: Take the current state, and overwrite ONLY the parts assigned to memberId
-      // from the incomingState.
-      
       setState(current => {
           const newState = { ...current };
 
@@ -90,18 +89,16 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
           if (incomingState.task2 && Array.isArray(incomingState.task2.tasks)) {
              newState.task2.tasks = current.task2.tasks.map(currentTask => {
                 if (currentTask.assignedToId === memberId) {
-                    // Find the version in incoming state
                     const incomingTask = incomingState.task2.tasks.find(t => t.id === currentTask.id);
                     if (incomingTask) {
-                        return incomingTask; // Overwrite with incoming
+                        return incomingTask; 
                     }
                 }
-                return currentTask; // Keep existing
+                return currentTask;
             });
           }
 
-          // 2. Merge Dishes
-          // We look for the dishes in incomingState that belong to memberId
+          // 2. Merge Dishes - Updated logic: Add any dish created by this author
           if (Array.isArray(incomingState.dishes)) {
               const incomingDishes = incomingState.dishes.filter(d => d.author === memberId);
               
@@ -117,17 +114,18 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
               newState.dishes = updatedDishes;
           }
 
-          // 3. Merge Task 6 Roles work (if applicable)
+          // 3. Merge Task 6 Roles work
           if (incomingState.menuPrototype) {
-              // If this member is the Designer (6.A), merge menuPrototype digital parts
-              if (current.task6.designerId === memberId) {
+              const isDesigner = current.task6.designerIds.includes(memberId);
+              const isArtisan = current.task6.artisanIds.includes(memberId);
+
+              if (isDesigner) {
                    newState.menuPrototype = {
                        ...newState.menuPrototype,
                        digitalLink: incomingState.menuPrototype.digitalLink || newState.menuPrototype.digitalLink
                    };
               }
-              // If this member is the Artisan (6.B), merge menuPrototype physical parts
-               if (current.task6.artisanId === memberId) {
+              if (isArtisan) {
                    newState.menuPrototype = {
                        ...newState.menuPrototype,
                        physicalPhoto: incomingState.menuPrototype.physicalPhoto || newState.menuPrototype.physicalPhoto,
@@ -192,55 +190,9 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const addDish = (dish: Dish) => {
-    // Force author to be current user
-    const dishWithAuthor = { ...dish, author: state.currentUser || '' };
+    // Force author to be current user if not set
+    const dishWithAuthor = { ...dish, author: dish.author || state.currentUser || '' };
     setState(prev => ({ ...prev, dishes: [...prev.dishes, dishWithAuthor] }));
-  };
-
-  const updateDishDistribution = (assignments: { type: DishType, authorId: string, name: string }[]) => {
-      setState(prev => {
-          // Robust update: Try to preserve existing dish data if types match
-          const unassignedDishes = [...prev.dishes];
-          const newDishes: Dish[] = [];
-
-          assignments.forEach(assign => {
-             // Find existing dish of this type
-             const matchIndex = unassignedDishes.findIndex(d => d.type === assign.type);
-             
-             if (matchIndex !== -1) {
-                 // Update existing dish author and keep data
-                 const existing = unassignedDishes[matchIndex];
-                 newDishes.push({
-                     ...existing,
-                     author: assign.authorId,
-                     // Only update name if it matches the generic assignment name or was empty
-                     name: (existing.name && existing.name.length > 3) ? existing.name : assign.name
-                 });
-                 unassignedDishes.splice(matchIndex, 1);
-             } else {
-                 // Create new dish entry
-                 newDishes.push({
-                    id: Math.random().toString(36).substr(2, 9),
-                    name: assign.name,
-                    type: assign.type,
-                    servings: 1,
-                    photo: null,
-                    description: '',
-                    elaboration: '',
-                    ingredients: [],
-                    allergens: [],
-                    sustainabilityJustification: '',
-                    cost: 0,
-                    price: 0,
-                    financials: { totalCost: 0, costPerServing: 0, foodCostPercent: 0, grossMargin: 0, grossMarginPercent: 0, salePrice: 0 },
-                    priceJustification: '',
-                    author: assign.authorId
-                 });
-             }
-          });
-          
-          return { ...prev, dishes: newDishes };
-      });
   };
 
   const removeDish = (id: string) => {
@@ -293,7 +245,6 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       updateConcept, 
       updateMission, 
       addDish, 
-      updateDishDistribution,
       removeDish, 
       updateDish,
       updateMenuPrototype,

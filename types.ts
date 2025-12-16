@@ -78,9 +78,9 @@ export interface MenuPrototype {
 }
 
 export interface Task6Roles {
-  designerId: string | null; // 6.A
-  artisanId: string | null; // 6.B
-  editorId: string | null; // 6.C
+  designerIds: string[]; // Changed to array for multiple assignees
+  artisanIds: string[];  // Changed to array
+  editorIds: string[];   // Changed to array
 }
 
 export interface ProjectState {

@@ -11,36 +11,34 @@ export const FinalMemory: React.FC = () => {
     window.print();
   };
 
-  const AuthorBlock: React.FC<{ children: React.ReactNode, authorId?: string | null, label?: string }> = ({ children, authorId, label }) => {
-      const author = state.team.find(m => m.id === authorId);
+  const AuthorBlock: React.FC<{ children: React.ReactNode, authorIds: string[], label?: string }> = ({ children, authorIds, label }) => {
+      const authors = state.team.filter(m => authorIds.includes(m.id)).map(m => m.name).join(', ');
       
-      // Check if content is effectively empty (assuming children is string or element with content)
-      // This is a simplification. For complex children, this check might need to be passed as a prop "isEmpty".
-      // Here we rely on the parent passing valid children only if content exists, OR we handle "Pending" visual.
-      
-      if (!authorId) return <>{children}</>;
-
       return (
-          <div className="relative group border-l-4 border-transparent hover:border-gray-200 pl-4 transition-all">
+          <div className="relative group border-l-4 border-transparent hover:border-gray-200 pl-4 transition-all h-full">
               {children}
-              <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded no-print">
-                  {label || 'Autor'}: {author?.name || 'Desconocido'}
-              </div>
+              {authors && (
+                <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded no-print">
+                    {label || 'Autor(es)'}: {authors}
+                </div>
+              )}
           </div>
       );
   };
 
-  const PendingBlock: React.FC<{ assigneeId: string | null, taskName: string }> = ({ assigneeId, taskName }) => {
-      const assignee = state.team.find(m => m.id === assigneeId);
+  const PendingBlock: React.FC<{ assigneeIds: string[], taskName: string }> = ({ assigneeIds, taskName }) => {
+      const assignees = state.team.filter(m => assigneeIds.includes(m.id)).map(m => m.name).join(', ');
       return (
           <div className="border-2 border-dashed border-red-300 bg-red-50 p-6 rounded-lg my-4 text-center break-inside-avoid">
               <AlertTriangle className="mx-auto text-red-400 mb-2" size={32} />
               <h4 className="font-bold text-red-800 uppercase text-sm">Sección Pendiente de Entrega</h4>
               <p className="text-red-600 text-sm font-medium">{taskName}</p>
-              <p className="text-xs text-red-500 mt-2">Responsable: {assignee?.name || 'Sin Asignar'}</p>
+              <p className="text-xs text-red-500 mt-2">Responsables: {assignees || 'Sin Asignar'}</p>
           </div>
       );
   };
+
+  const editorNames = state.team.filter(m => state.task6.editorIds.includes(m.id)).map(m => m.name).join(', ');
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -89,7 +87,7 @@ export const FinalMemory: React.FC = () => {
                 </div>
                 <p className="mt-6 text-green-700 font-bold">Zona: {state.selectedZone?.name}</p>
                 <p className="mt-4">{new Date().toLocaleDateString()}</p>
-                <p className="text-xs text-gray-400 mt-2">Editor Jefe: {state.team.find(m => m.id === state.task6.editorId)?.name || '...'}</p>
+                <p className="text-xs text-gray-400 mt-2">Editores: {editorNames || '...'}</p>
             </div>
         </div>
 
@@ -139,10 +137,12 @@ export const FinalMemory: React.FC = () => {
              <div className="space-y-6">
                 {state.task2.tasks.map((task) => {
                     const hasContent = task.content && task.content.length > 5;
-                    if (!hasContent) return <PendingBlock key={task.id} assigneeId={task.assignedToId} taskName={task.title} />;
+                    const assigneeIds = task.assignedToId ? [task.assignedToId] : [];
+                    
+                    if (!hasContent) return <PendingBlock key={task.id} assigneeIds={assigneeIds} taskName={task.title} />;
                     
                     return (
-                        <AuthorBlock key={task.id} authorId={task.assignedToId}>
+                        <AuthorBlock key={task.id} authorIds={assigneeIds}>
                             <div className="border-b pb-4 mb-4">
                                 <h4 className="font-bold">{task.title}</h4>
                                 <p className="text-sm text-gray-600 whitespace-pre-wrap">{task.content}</p>
@@ -187,7 +187,7 @@ export const FinalMemory: React.FC = () => {
             {state.dishes.length === 0 && <p className="text-gray-400">No hay platos creados.</p>}
             <div className="grid grid-cols-1 gap-8">
                 {state.dishes.map(dish => (
-                     <AuthorBlock key={dish.id} authorId={dish.author} label="Chef del Plato">
+                     <AuthorBlock key={dish.id} authorIds={[dish.author]} label="Chef del Plato">
                          <div className="border p-4 rounded break-inside-avoid shadow-sm">
                             <div className="flex justify-between border-b pb-2 mb-2">
                                 <h3 className="font-bold text-xl">{dish.name}</h3>
@@ -217,19 +217,19 @@ export const FinalMemory: React.FC = () => {
              <div className="grid md:grid-cols-2 gap-6">
                 
                 {/* Digital Menu */}
-                <AuthorBlock authorId={state.task6.designerId} label="Diseñador Gráfico">
+                <AuthorBlock authorIds={state.task6.designerIds} label="Diseñadores Gráficos">
                     <div className="border p-4 rounded h-full">
                         <h3 className="font-bold mb-2 text-purple-900">Carta Digital (Misión 6.A)</h3>
                         {state.menuPrototype.digitalLink ? (
                             <p className="text-sm text-blue-600 break-all">{state.menuPrototype.digitalLink}</p>
                         ) : (
-                            <PendingBlock assigneeId={state.task6.designerId} taskName="Misión 6.A: Diseño Digital" />
+                            <PendingBlock assigneeIds={state.task6.designerIds} taskName="Misión 6.A: Diseño Digital" />
                         )}
                     </div>
                 </AuthorBlock>
 
                 {/* Physical Menu */}
-                <AuthorBlock authorId={state.task6.artisanId} label="Artesano">
+                <AuthorBlock authorIds={state.task6.artisanIds} label="Artesanos">
                     <div className="border p-4 rounded h-full">
                          <h3 className="font-bold mb-2 text-orange-900">Carta Física (Misión 6.B)</h3>
                          {state.menuPrototype.physicalPhoto ? (
@@ -238,7 +238,7 @@ export const FinalMemory: React.FC = () => {
                                 <p className="text-sm">{state.menuPrototype.physicalDescription}</p>
                              </>
                          ) : (
-                             <PendingBlock assigneeId={state.task6.artisanId} taskName="Misión 6.B: Maqueta Física" />
+                             <PendingBlock assigneeIds={state.task6.artisanIds} taskName="Misión 6.B: Maqueta Física" />
                          )}
                     </div>
                 </AuthorBlock>
@@ -251,7 +251,7 @@ export const FinalMemory: React.FC = () => {
             <div className="space-y-12">
                 {state.dishes.map((dish) => (
                     <div key={dish.id} className="break-inside-avoid break-after-page">
-                        <AuthorBlock authorId={dish.author} label="Gestor del Escandallo">
+                        <AuthorBlock authorIds={[dish.author]} label="Gestor del Escandallo">
                              {/* Simplified Escandallo View for Memory */}
                              <div className="border-2 border-black bg-white mb-6 p-4">
                                 <h3 className="text-lg font-bold uppercase mb-2">Escandallo: {dish.name}</h3>
@@ -277,7 +277,7 @@ export const FinalMemory: React.FC = () => {
         
         {/* Footer */}
         <div className="text-center text-xs text-gray-400 mt-20 pt-8 border-t">
-            Generado con Murcia Sostenible App - Editor Jefe: {state.team.find(m => m.id === state.task6.editorId)?.name || 'N/A'}
+            Generado con Murcia Sostenible App - Editores: {editorNames || 'N/A'}
         </div>
       </div>
     </div>

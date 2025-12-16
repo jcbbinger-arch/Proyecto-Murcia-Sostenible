@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, DishType, IngredientRow } from '../types';
 import { ALLERGENS } from '../constants';
-import { Plus, Trash2, Edit2, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, AlertCircle, BookOpen, PenTool, ClipboardList, Lock, User } from 'lucide-react';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -68,6 +68,11 @@ export const MenuDesign: React.FC = () => {
     setIsEditing(null);
   };
 
+  const handleCreateNew = () => {
+      resetForm();
+      setIsEditing("NEW"); // Marker state to show form for new dish
+  }
+
   const handleEditClick = (dish: Dish) => {
     let safeIngredients = dish.ingredients;
     if (typeof dish.ingredients === 'string') {
@@ -83,6 +88,13 @@ export const MenuDesign: React.FC = () => {
     setActiveTab('design');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleDeleteClick = (id: string) => {
+      if(confirm("¿Seguro que quieres eliminar este plato?")) {
+          removeDish(id);
+          if (isEditing === id) resetForm();
+      }
+  }
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -145,7 +157,7 @@ export const MenuDesign: React.FC = () => {
                 onClick={() => setActiveTab('design')}
                 className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${activeTab === 'design' ? 'bg-green-600 text-white' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
             >
-                <PenTool size={18} /> Diseño Fichas
+                <PenTool size={18} /> Editor de Fichas
             </button>
              <button 
                 onClick={() => setActiveTab('review')}
@@ -163,14 +175,20 @@ export const MenuDesign: React.FC = () => {
             
             <div className="grid md:grid-cols-2 gap-8">
                 <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
-                    <h4 className="font-bold text-blue-900 mt-0">Documentación Profesional</h4>
-                    <p className="text-sm">Cada miembro debe trabajar en el plato que le ha sido asignado en la "Configuración Inicial".</p>
+                    <h4 className="font-bold text-blue-900 mt-0">Trabajo Individual</h4>
+                    <p className="text-sm">Cada miembro del equipo debe crear <strong>4 fichas técnicas</strong> completas.</p>
+                    <ul className="text-sm list-disc pl-5 mt-2">
+                        <li>1 Aperitivo / Snack</li>
+                        <li>1 Entrante</li>
+                        <li>1 Plato Principal</li>
+                        <li>1 Postre</li>
+                    </ul>
                 </div>
             </div>
             
             <div className="mt-6 flex justify-center">
                  <button onClick={() => setActiveTab('design')} className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow hover:bg-green-700">
-                    Ir al Editor de Fichas
+                    Comenzar a Crear Platos
                  </button>
             </div>
         </div>
@@ -182,22 +200,26 @@ export const MenuDesign: React.FC = () => {
         
         {/* List Column (Left) */}
         <div className="lg:col-span-4 space-y-4 order-2 lg:order-1">
-            <h3 className="text-lg font-bold text-gray-700">Mis Platos Asignados</h3>
+            <button 
+                onClick={handleCreateNew}
+                className="w-full bg-gray-900 text-white p-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-gray-800"
+            >
+                <Plus size={20} /> Crear Nuevo Plato
+            </button>
+
+            <h3 className="text-lg font-bold text-gray-700 mt-4 flex items-center gap-2">
+                <User size={20} /> Mis Platos Creados
+            </h3>
             
-            {state.dishes.length === 0 && (
+            {state.dishes.filter(d => d.author === state.currentUser).length === 0 && (
                 <div className="bg-white p-6 rounded-xl border border-dashed border-gray-300 text-center text-gray-400">
-                    <p>No hay platos distribuidos aún. El Coordinador debe asignarlos en la Configuración Inicial.</p>
+                    <p>Aún no has creado ningún plato. ¡Dale al botón de arriba!</p>
                 </div>
             )}
             
-            {state.dishes.map((dish) => {
-                const isMyDish = !state.currentUser || state.currentUser === dish.author;
-                const authorName = state.team.find(m => m.id === dish.author)?.name || 'Desconocido';
-
-                return (
-                    <div key={dish.id} className={`p-4 rounded-xl border shadow-sm transition flex gap-3 ${
-                        isMyDish ? 'bg-white border-green-200 hover:border-green-400 cursor-pointer' : 'bg-gray-50 border-gray-200 opacity-70'
-                    }`}>
+            <div className="space-y-3">
+                {state.dishes.filter(d => d.author === state.currentUser).map((dish) => (
+                    <div key={dish.id} className="p-4 rounded-xl border shadow-sm transition flex gap-3 bg-white border-green-100 hover:border-green-400 cursor-pointer">
                         <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
                             {dish.photo ? (
                                 <img src={dish.photo} alt={dish.name} className="w-full h-full object-cover" />
@@ -205,21 +227,36 @@ export const MenuDesign: React.FC = () => {
                                 <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20}/></div>
                             )}
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0" onClick={() => handleEditClick(dish)}>
                             <div className="flex justify-between items-start">
                                 <span className="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase truncate">{dish.type}</span>
-                                {isMyDish ? (
-                                    <button onClick={() => handleEditClick(dish)} className="p-1 text-blue-600 hover:bg-blue-50 rounded"><Edit2 size={16}/></button>
-                                ) : (
-                                    <Lock size={16} className="text-gray-400" />
-                                )}
                             </div>
                             <h4 className="font-bold text-gray-800 text-sm truncate mt-1">{dish.name}</h4>
-                            <p className="text-xs text-gray-500 mt-1">Chef: {authorName}</p>
                         </div>
+                         <button onClick={() => handleDeleteClick(dish.id)} className="text-red-400 hover:text-red-600 p-1">
+                            <Trash2 size={16} />
+                        </button>
                     </div>
-                );
-            })}
+                ))}
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-700 mt-6 pt-4 border-t">Platos del Equipo</h3>
+             <div className="space-y-3 opacity-70">
+                {state.dishes.filter(d => d.author !== state.currentUser).map((dish) => {
+                    const authorName = state.team.find(m => m.id === dish.author)?.name || 'Otro';
+                    return (
+                        <div key={dish.id} className="p-3 rounded-xl border bg-gray-50 flex gap-3">
+                             <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0"></div>
+                             <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-gray-600 text-xs truncate">{dish.name}</h4>
+                                <p className="text-[10px] text-gray-400">Chef: {authorName}</p>
+                             </div>
+                             <Lock size={14} className="text-gray-300" />
+                        </div>
+                    )
+                })}
+             </div>
+
         </div>
 
         {/* Form Column (Right) */}
@@ -227,13 +264,13 @@ export const MenuDesign: React.FC = () => {
             {!isEditing ? (
                 <div className="p-12 text-center text-gray-500">
                     <PenTool size={48} className="mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg">Selecciona uno de tus platos asignados a la izquierda para comenzar a editar la ficha técnica.</p>
+                    <p className="text-lg">Selecciona un plato para editar o crea uno nuevo.</p>
                 </div>
             ) : (
                 <>
                 <div className="bg-gray-50 p-4 border-b flex justify-between items-center">
                     <h3 className="text-xl font-bold text-gray-800">
-                        Editando: {newDish.name}
+                        {isEditing === 'NEW' ? 'Creando Nuevo Plato' : `Editando: ${newDish.name}`}
                     </h3>
                     <div className="flex space-x-2">
                         {[1, 2, 3].map(step => (
@@ -491,7 +528,7 @@ export const MenuDesign: React.FC = () => {
                                         onClick={handleSaveDish}
                                         className="bg-green-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-green-700 shadow-lg flex items-center gap-2"
                                     >
-                                        <Plus size={18} /> Guardar Cambios
+                                        <Plus size={18} /> Guardar Plato
                                     </button>
                                 </div>
                             </div>
@@ -507,9 +544,9 @@ export const MenuDesign: React.FC = () => {
       {/* TAB 3: REVIEW */}
       {activeTab === 'review' && (
         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Revisión de la Carta</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Revisión de la Carta Completa</h3>
             <p className="text-gray-600 mb-8">
-                Aquí puedes ver un resumen de los platos creados antes de generar la Memoria Parcial.
+                Resumen de todos los platos creados por el equipo.
             </p>
 
             <div className="max-w-3xl mx-auto space-y-4 text-left">
@@ -520,21 +557,23 @@ export const MenuDesign: React.FC = () => {
                         <div key={type} className="border-b pb-4">
                             <h4 className="text-lg font-bold text-green-800 uppercase mb-2">{type}</h4>
                             <ul className="space-y-2">
-                                {dishesOfType.map(dish => (
-                                    <li key={dish.id} className="flex justify-between text-sm">
-                                        <span className="font-medium text-gray-900">{dish.name}</span>
-                                        <span className="text-gray-500 italic">{dish.price}€</span>
-                                    </li>
-                                ))}
+                                {dishesOfType.map(dish => {
+                                    const authorName = state.team.find(m => m.id === dish.author)?.name || 'Desconocido';
+                                    return (
+                                        <li key={dish.id} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded">
+                                            <div>
+                                                <span className="font-medium text-gray-900">{dish.name}</span>
+                                                <span className="text-xs text-gray-400 ml-2">({authorName})</span>
+                                            </div>
+                                            <span className="text-gray-500 italic">{dish.price}€</span>
+                                        </li>
+                                    )
+                                })}
                             </ul>
                         </div>
                     )
                 })}
                  {state.dishes.length === 0 && <p className="text-gray-400 italic text-center">No hay platos en la carta aún.</p>}
-            </div>
-
-            <div className="mt-8 bg-blue-50 p-4 rounded text-blue-900 text-sm inline-block">
-                Para generar el PDF completo (Capítulos 1-4), ve a la sección <strong>"Memoria Final"</strong> en el menú lateral.
             </div>
         </div>
       )}

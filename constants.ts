@@ -134,9 +134,9 @@ export const INITIAL_STATE: ProjectState = {
     physicalDescription: ''
   },
   task6: {
-    designerId: null,
-    artisanId: null,
-    editorId: null
+    designerIds: [],
+    artisanIds: [],
+    editorIds: []
   },
   team: []
 };

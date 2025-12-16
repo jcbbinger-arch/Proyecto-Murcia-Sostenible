@@ -8,6 +8,19 @@ export const Task6_FinalAssembly: React.FC = () => {
 
   const isCoordinator = state.currentUser ? state.team.find(m => m.id === state.currentUser)?.isCoordinator : true;
 
+  const toggleRole = (roleType: 'designerIds' | 'artisanIds' | 'editorIds', memberId: string) => {
+      if (!isCoordinator) return;
+      
+      const currentIds = state.task6[roleType];
+      let newIds: string[];
+      if (currentIds.includes(memberId)) {
+          newIds = currentIds.filter(id => id !== memberId);
+      } else {
+          newIds = [...currentIds, memberId];
+      }
+      updateTask6Roles({ [roleType]: newIds });
+  };
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-8 flex flex-col md:flex-row justify-between items-center no-print gap-4">
@@ -65,68 +78,74 @@ export const Task6_FinalAssembly: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Asignación de Roles Finales</h3>
                 <p className="text-gray-600 mb-6">
                     {isCoordinator 
-                    ? "Puedes asignar roles aquí o en la Configuración Inicial."
+                    ? "Como Coordinador, asigna los miembros (pueden ser varios por rol)."
                     : "Solo lectura. Tu rol ha sido asignado por el Coordinador."}
                 </p>
 
-                <div className="grid gap-6">
+                <div className="grid md:grid-cols-3 gap-6">
                     {/* Role A */}
-                    <div className="flex items-center justify-between p-4 bg-purple-50 rounded border border-purple-100">
-                        <div>
-                            <h4 className="font-bold text-purple-900">Misión 6.A: El Diseñador Gráfico FINAL</h4>
-                            <p className="text-xs text-purple-700">Carta Virtual Final y QR.</p>
-                        </div>
-                        <div className="flex items-center gap-2">
+                    <div className="p-4 bg-purple-50 rounded border border-purple-100">
+                        <div className="flex justify-between items-start mb-4">
+                            <h4 className="font-bold text-purple-900">Misión 6.A: Diseñadores</h4>
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
-                            <select 
-                                className="p-2 rounded border border-purple-300 disabled:bg-gray-100 disabled:text-gray-500"
-                                value={state.task6.designerId || ''}
-                                onChange={(e) => updateTask6Roles({ designerId: e.target.value })}
-                                disabled={!isCoordinator}
-                            >
-                                <option value="">-- Seleccionar --</option>
-                                {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                            </select>
+                        </div>
+                        <div className="space-y-2">
+                             {state.team.map(m => (
+                                <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-purple-100 cursor-pointer' : ''}`}>
+                                    <input 
+                                        type="checkbox"
+                                        checked={state.task6.designerIds.includes(m.id)}
+                                        onChange={() => toggleRole('designerIds', m.id)}
+                                        disabled={!isCoordinator}
+                                        className="rounded text-purple-600 focus:ring-purple-500"
+                                    />
+                                    {m.name}
+                                </label>
+                            ))}
                         </div>
                     </div>
 
                     {/* Role B */}
-                    <div className="flex items-center justify-between p-4 bg-orange-50 rounded border border-orange-100">
-                        <div>
-                            <h4 className="font-bold text-orange-900">Misión 6.B: El Artesano FINAL</h4>
-                            <p className="text-xs text-orange-700">Maqueta Física Final.</p>
-                        </div>
-                         <div className="flex items-center gap-2">
+                    <div className="p-4 bg-orange-50 rounded border border-orange-100">
+                         <div className="flex justify-between items-start mb-4">
+                            <h4 className="font-bold text-orange-900">Misión 6.B: Artesanos</h4>
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
-                            <select 
-                                className="p-2 rounded border border-orange-300 disabled:bg-gray-100 disabled:text-gray-500"
-                                value={state.task6.artisanId || ''}
-                                onChange={(e) => updateTask6Roles({ artisanId: e.target.value })}
-                                disabled={!isCoordinator}
-                            >
-                                <option value="">-- Seleccionar --</option>
-                                {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                            </select>
+                        </div>
+                        <div className="space-y-2">
+                             {state.team.map(m => (
+                                <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-orange-100 cursor-pointer' : ''}`}>
+                                    <input 
+                                        type="checkbox"
+                                        checked={state.task6.artisanIds.includes(m.id)}
+                                        onChange={() => toggleRole('artisanIds', m.id)}
+                                        disabled={!isCoordinator}
+                                        className="rounded text-orange-600 focus:ring-orange-500"
+                                    />
+                                    {m.name}
+                                </label>
+                            ))}
                         </div>
                     </div>
 
                     {/* Role C */}
-                    <div className="flex items-center justify-between p-4 bg-blue-50 rounded border border-blue-100">
-                        <div>
-                            <h4 className="font-bold text-blue-900">Misión 6.C: El Editor Jefe</h4>
-                            <p className="text-xs text-blue-700">Ensamblaje Memoria y Entrega.</p>
-                        </div>
-                         <div className="flex items-center gap-2">
+                    <div className="p-4 bg-blue-50 rounded border border-blue-100">
+                         <div className="flex justify-between items-start mb-4">
+                            <h4 className="font-bold text-blue-900">Misión 6.C: Editores</h4>
                             {!isCoordinator && <Lock size={16} className="text-gray-400" />}
-                            <select 
-                                className="p-2 rounded border border-blue-300 disabled:bg-gray-100 disabled:text-gray-500"
-                                value={state.task6.editorId || ''}
-                                onChange={(e) => updateTask6Roles({ editorId: e.target.value })}
-                                disabled={!isCoordinator}
-                            >
-                                <option value="">-- Seleccionar --</option>
-                                {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                            </select>
+                        </div>
+                        <div className="space-y-2">
+                             {state.team.map(m => (
+                                <label key={m.id} className={`flex items-center gap-2 text-sm p-1 rounded ${isCoordinator ? 'hover:bg-blue-100 cursor-pointer' : ''}`}>
+                                    <input 
+                                        type="checkbox"
+                                        checked={state.task6.editorIds.includes(m.id)}
+                                        onChange={() => toggleRole('editorIds', m.id)}
+                                        disabled={!isCoordinator}
+                                        className="rounded text-blue-600 focus:ring-blue-500"
+                                    />
+                                    {m.name}
+                                </label>
+                            ))}
                         </div>
                     </div>
                 </div>

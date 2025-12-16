@@ -1,39 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { DishType } from '../types';
 import { Settings, Save, Download, AlertTriangle } from 'lucide-react';
 
 export const ProjectSetup: React.FC = () => {
   const { 
     state, 
     assignTask, 
-    updateTask6Roles, 
-    updateDishDistribution
+    updateTask6Roles
   } = useProject();
 
-  // Local state for dish assignments (before saving to context)
-  const [dishAssignments, setDishAssignments] = useState<{type: DishType, authorId: string, name: string}[]>([
-      { type: DishType.APPETIZER, authorId: '', name: 'Aperitivo Creativo' },
-      { type: DishType.STARTER, authorId: '', name: 'Entrante Km0' },
-      { type: DishType.MAIN, authorId: '', name: 'Principal Sostenible' },
-      { type: DishType.DESSERT, authorId: '', name: 'Postre Murciano' }
-  ]);
-
-  const handleDishAssign = (index: number, authorId: string) => {
-      const newAssignments = [...dishAssignments];
-      newAssignments[index].authorId = authorId;
-      setDishAssignments(newAssignments);
-  };
-
-  const saveDistribution = () => {
-      // 1. Save Dish Placeholders
-      // Check if all dishes have authors
-      if(dishAssignments.some(d => !d.authorId)) {
-          alert("Por favor, asigna un responsable para cada uno de los 4 platos.");
-          return;
+  const toggleRole = (roleType: 'designerIds' | 'artisanIds' | 'editorIds', memberId: string) => {
+      const currentIds = state.task6[roleType];
+      let newIds: string[];
+      if (currentIds.includes(memberId)) {
+          newIds = currentIds.filter(id => id !== memberId);
+      } else {
+          newIds = [...currentIds, memberId];
       }
-      updateDishDistribution(dishAssignments);
-      alert("¡Distribución guardada! Si ya existían platos, se han actualizado los autores. Ahora descarga el archivo de equipo.");
+      updateTask6Roles({ [roleType]: newIds });
   };
 
   const handleExportConfig = () => {
@@ -63,7 +47,7 @@ export const ProjectSetup: React.FC = () => {
             <Settings className="text-green-600"/> Configuración y Reparto Global
         </h2>
         <p className="text-gray-600 mt-2">
-          <strong>Solo Coordinador:</strong> Utiliza esta pantalla para distribuir <strong>TODAS</strong> las tareas del proyecto. 
+          <strong>Solo Coordinador:</strong> Utiliza esta pantalla para distribuir las tareas colaborativas. 
           Al terminar, descarga el "Archivo Maestro" y envíalo a tus compañeros.
         </p>
       </div>
@@ -93,90 +77,83 @@ export const ProjectSetup: React.FC = () => {
               </div>
           </section>
 
-          {/* SECTION 2: DISHES */}
+          {/* SECTION 2: DISHES - Removed as per request, replaced with info */}
           <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h3 className="text-xl font-bold text-green-900 mb-4">2. Reparto de Carta (Tarea 3)</h3>
-              <p className="text-sm text-gray-500 mb-4">Define quién diseñará cada categoría de plato.</p>
-              
-              <div className="grid md:grid-cols-4 gap-4">
-                  {dishAssignments.map((slot, idx) => (
-                      <div key={idx} className="p-4 border-2 border-dashed border-green-300 rounded-lg bg-green-50">
-                          <h4 className="font-bold text-green-800 text-sm uppercase mb-2">{slot.type}</h4>
-                          <input 
-                            className="w-full text-xs p-1 mb-2 border rounded"
-                            value={slot.name}
-                            onChange={(e) => {
-                                const copy = [...dishAssignments];
-                                copy[idx].name = e.target.value;
-                                setDishAssignments(copy);
-                            }}
-                            placeholder="Nombre provisional"
-                          />
-                          <select 
-                            className="w-full text-sm border p-1 rounded"
-                            value={slot.authorId}
-                            onChange={(e) => handleDishAssign(idx, e.target.value)}
-                          >
-                              <option value="">-- Chef --</option>
-                              {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                          </select>
-                      </div>
-                  ))}
+              <h3 className="text-xl font-bold text-green-900 mb-4">2. Carta y Fichas Técnicas (Tarea 3)</h3>
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-green-800">
+                  <p><strong>Nota importante:</strong> Esta tarea <strong>NO se reparte</strong> aquí. Cada miembro del equipo debe crear sus <strong>4 fichas técnicas</strong> (Aperitivo, Entrante, Principal y Postre) individualmente en la sección "Carta".</p>
               </div>
           </section>
 
           {/* SECTION 3: ROLES TASK 6 */}
           <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="text-xl font-bold text-purple-900 mb-4">3. Roles Finales (Tarea 6)</h3>
-              <p className="text-sm text-gray-500 mb-4">Asigna las responsabilidades de producción final.</p>
+              <p className="text-sm text-gray-500 mb-4">Asigna las responsabilidades de producción final. Puedes seleccionar a <strong>varias personas</strong> por rol.</p>
               
               <div className="grid md:grid-cols-3 gap-6">
-                  <div className="p-3 bg-purple-50 rounded border border-purple-200">
-                      <h4 className="font-bold text-purple-900 text-sm mb-2">Diseñador Gráfico (Digital)</h4>
-                      <select 
-                        className="w-full text-sm border p-1 rounded"
-                        value={state.task6.designerId || ''}
-                        onChange={(e) => updateTask6Roles({ designerId: e.target.value })}
-                      >
-                          <option value="">-- Asignar --</option>
-                          {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                      </select>
+                  {/* Designer */}
+                  <div className="p-4 bg-purple-50 rounded border border-purple-200">
+                      <h4 className="font-bold text-purple-900 text-sm mb-3">Diseñadores Gráficos (Digital)</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {state.team.map(m => (
+                            <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-purple-100 p-1 rounded">
+                                <input 
+                                    type="checkbox"
+                                    checked={state.task6.designerIds.includes(m.id)}
+                                    onChange={() => toggleRole('designerIds', m.id)}
+                                    className="rounded text-purple-600 focus:ring-purple-500"
+                                />
+                                {m.name}
+                            </label>
+                        ))}
+                      </div>
                   </div>
-                  <div className="p-3 bg-orange-50 rounded border border-orange-200">
-                      <h4 className="font-bold text-orange-900 text-sm mb-2">Artesano (Físico)</h4>
-                      <select 
-                        className="w-full text-sm border p-1 rounded"
-                        value={state.task6.artisanId || ''}
-                        onChange={(e) => updateTask6Roles({ artisanId: e.target.value })}
-                      >
-                          <option value="">-- Asignar --</option>
-                          {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                      </select>
+
+                  {/* Artisan */}
+                  <div className="p-4 bg-orange-50 rounded border border-orange-200">
+                      <h4 className="font-bold text-orange-900 text-sm mb-3">Artesanos (Físico)</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {state.team.map(m => (
+                            <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-orange-100 p-1 rounded">
+                                <input 
+                                    type="checkbox"
+                                    checked={state.task6.artisanIds.includes(m.id)}
+                                    onChange={() => toggleRole('artisanIds', m.id)}
+                                    className="rounded text-orange-600 focus:ring-orange-500"
+                                />
+                                {m.name}
+                            </label>
+                        ))}
+                      </div>
                   </div>
-                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
-                      <h4 className="font-bold text-blue-900 text-sm mb-2">Editor Jefe (Memoria)</h4>
-                      <select 
-                        className="w-full text-sm border p-1 rounded"
-                        value={state.task6.editorId || ''}
-                        onChange={(e) => updateTask6Roles({ editorId: e.target.value })}
-                      >
-                          <option value="">-- Asignar --</option>
-                          {state.team.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                      </select>
+
+                  {/* Editor */}
+                  <div className="p-4 bg-blue-50 rounded border border-blue-200">
+                      <h4 className="font-bold text-blue-900 text-sm mb-3">Editores Jefes (Memoria)</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {state.team.map(m => (
+                            <label key={m.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-blue-100 p-1 rounded">
+                                <input 
+                                    type="checkbox"
+                                    checked={state.task6.editorIds.includes(m.id)}
+                                    onChange={() => toggleRole('editorIds', m.id)}
+                                    className="rounded text-blue-600 focus:ring-blue-500"
+                                />
+                                {m.name}
+                            </label>
+                        ))}
+                      </div>
                   </div>
               </div>
           </section>
 
-          <div className="fixed bottom-0 left-64 right-0 p-4 bg-white border-t border-gray-200 shadow-lg flex justify-between items-center z-20">
-              <div className="text-sm text-gray-600">
-                  Asegúrate de haber asignado TODO antes de generar el archivo maestro.
-              </div>
+          <div className="fixed bottom-0 left-64 right-0 p-4 bg-white border-t border-gray-200 shadow-lg flex justify-end items-center z-20">
               <div className="flex gap-4">
                   <button 
-                    onClick={saveDistribution}
+                    onClick={() => alert("Configuración guardada en tu navegador.")}
                     className="flex items-center gap-2 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-bold"
                   >
-                      <Save size={18} /> 1. Guardar Configuración
+                      <Save size={18} /> 1. Guardar
                   </button>
                   <button 
                     onClick={handleExportConfig}
