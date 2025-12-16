@@ -78,20 +78,40 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   const importProjectData = (data: ProjectState) => {
     // Sanitize incoming data too
     const cleanData = sanitizeState(data);
-    setState({ ...cleanData, currentUser: state.currentUser }); 
+    // When importing a full project, we often reset currentUser so they must select again (security/logic check)
+    setState({ ...cleanData, currentUser: null }); 
   };
 
   const mergeContribution = (incomingState: ProjectState, memberId: string) => {
       setState(current => {
           const newState = { ...current };
+          const contributorName = current.team.find(m => m.id === memberId)?.name || 'Miembro del Equipo';
 
-          // 1. Merge Task 2 (Analysis)
+          // 1. Merge Task 2 (Analysis) - SMART MERGE
           if (incomingState.task2 && Array.isArray(incomingState.task2.tasks)) {
              newState.task2.tasks = current.task2.tasks.map(currentTask => {
-                if (currentTask.assignedToId === memberId) {
-                    const incomingTask = incomingState.task2.tasks.find(t => t.id === currentTask.id);
-                    if (incomingTask) {
-                        return incomingTask; 
+                const incomingTask = incomingState.task2.tasks.find(t => t.id === currentTask.id);
+                
+                // If there is incoming data for this task
+                if (incomingTask && incomingTask.content && incomingTask.content.trim() !== "") {
+                    
+                    // Case A: The task was empty in master, just take the new content
+                    if (!currentTask.content || currentTask.content.trim() === "") {
+                        return { ...currentTask, content: incomingTask.content };
+                    }
+
+                    // Case B: The task has content, but it's different. 
+                    // This handles the "two people assigned" or "overlap" scenario.
+                    // We append the new content with a label so nothing is lost.
+                    if (currentTask.content !== incomingTask.content) {
+                        // Prevent duplicating if the user just imported their own file back
+                        if (currentTask.content.includes(incomingTask.content)) {
+                            return currentTask;
+                        }
+                        return {
+                            ...currentTask,
+                            content: `${currentTask.content}\n\n--- Aportación de ${contributorName} ---\n${incomingTask.content}`
+                        };
                     }
                 }
                 return currentTask;

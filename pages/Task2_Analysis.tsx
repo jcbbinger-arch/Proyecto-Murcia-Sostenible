@@ -143,7 +143,7 @@ export const Task2_Analysis: React.FC = () => {
                 const isExpanded = expandedTask === task.id;
                 const isCompleted = task.content.length > 20;
                 
-                // LOCK LOGIC
+                // LOCK LOGIC: Ensure strict lock based on user ID
                 const isLocked = state.currentUser && state.currentUser !== task.assignedToId;
 
                 return (
@@ -176,8 +176,10 @@ export const Task2_Analysis: React.FC = () => {
                                 </div>
                                 {isLocked ? (
                                     <div className="p-4 bg-gray-100 border border-gray-300 rounded text-gray-500 italic text-center">
-                                        Esta tarea está asignada a {assignee?.name}. Tú no puedes editarla.
-                                        {task.content && <div className="mt-2 p-2 bg-white border text-left not-italic text-gray-800">{task.content}</div>}
+                                        <Lock size={24} className="mx-auto mb-2 text-gray-400"/>
+                                        <p>Esta tarea está asignada a <strong>{assignee?.name || "otra persona"}</strong>.</p>
+                                        <p className="text-xs mt-1">Solo el responsable puede editarla. (Si eres tú, identifícate en el Panel Principal).</p>
+                                        {task.content && <div className="mt-4 p-3 bg-white border text-left not-italic text-gray-800 shadow-inner rounded">{task.content}</div>}
                                     </div>
                                 ) : (
                                     <>
@@ -186,6 +188,7 @@ export const Task2_Analysis: React.FC = () => {
                                             placeholder="Escribe aquí tu mini-informe..."
                                             value={task.content}
                                             onChange={(e) => updateTaskContent(task.id, e.target.value)}
+                                            disabled={isLocked} // Safety redundancy
                                         />
                                         <div className="mt-2 text-right">
                                             <span className="text-xs text-gray-400">{task.content.length} caracteres</span>
