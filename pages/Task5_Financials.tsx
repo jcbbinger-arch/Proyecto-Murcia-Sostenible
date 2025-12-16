@@ -15,6 +15,7 @@ export const Task5_Financials: React.FC = () => {
       const dish = state.dishes.find(d => d.id === selectedDishId);
       if (dish) {
         // Ensure ingredients have proper numeric values
+        // We keep the row calculation (Quantity * Price) as a helper, but totals are manual
         const ingredientsWithFinancials = dish.ingredients.map(ing => ({
             ...ing,
             quantity: ing.quantity || 0, // Enforce existing quantity
@@ -32,46 +33,8 @@ export const Task5_Financials: React.FC = () => {
     }
   }, [selectedDishId, state.dishes]);
 
-  // Recalculate totals whenever ingredients or target PVP changes
-  useEffect(() => {
-    if (!currentDish) return;
-
-    const totalRawMaterialCost = currentDish.ingredients.reduce((sum, ing) => sum + (ing.totalCost || 0), 0);
-    const costPerServing = currentDish.servings > 0 ? totalRawMaterialCost / currentDish.servings : 0;
-    
-    // Safety check for division by zero
-    const pvp = currentDish.price || 0;
-    
-    // Calculations based on the provided sheet logic
-    // Food Cost % = (Cost Per Serving / PVP) * 100
-    const foodCostPercent = pvp > 0 ? (costPerServing / pvp) * 100 : 0;
-    
-    // Gross Margin = PVP - Cost Per Serving
-    const grossMargin = pvp - costPerServing;
-    
-    // Gross Margin % = (Gross Margin / PVP) * 100
-    const grossMarginPercent = pvp > 0 ? (grossMargin / pvp) * 100 : 0;
-    
-    // Note: The "Calculated Sale Price" row usually implies (Cost / Ideal Food Cost %), 
-    // but here we just show what leads to the final PVP input. We'll simplify to just track totals.
-
-    setCurrentDish(prev => {
-        if (!prev) return null;
-        return {
-            ...prev,
-            financials: {
-                totalCost: totalRawMaterialCost,
-                costPerServing: costPerServing,
-                foodCostPercent: foodCostPercent,
-                grossMargin: grossMargin,
-                grossMarginPercent: grossMarginPercent,
-                salePrice: pvp 
-            }
-        };
-    });
-
-  }, [currentDish?.ingredients, currentDish?.price, currentDish?.servings]);
-
+  // REMOVED: The useEffect that automatically calculated totals based on ingredients.
+  // Now students must enter these values manually.
 
   const handleUnitPriceChange = (id: string, value: number) => {
     if (!currentDish) return;
@@ -79,7 +42,7 @@ export const Task5_Financials: React.FC = () => {
     const updatedIngredients = currentDish.ingredients.map(ing => {
         if (ing.id === id) {
             const newPrice = value;
-            // Recalculate row total: Quantity (Fixed from Task 3) * Price
+            // We still auto-calculate the ROW total (Quantity * Price) for convenience
             return { 
                 ...ing, 
                 unitPrice: newPrice,
@@ -92,6 +55,18 @@ export const Task5_Financials: React.FC = () => {
     setCurrentDish({ ...currentDish, ingredients: updatedIngredients });
   };
 
+  // Handler for manual financial inputs (Totals, Margins, Percents)
+  const handleFinancialInput = (field: keyof typeof currentDish.financials, value: number) => {
+      if (!currentDish) return;
+      setCurrentDish({
+          ...currentDish,
+          financials: {
+              ...currentDish.financials,
+              [field]: value
+          }
+      });
+  };
+
   const handlePVPChange = (val: number) => {
       if (!currentDish) return;
       setCurrentDish({ ...currentDish, price: val });
@@ -99,14 +74,13 @@ export const Task5_Financials: React.FC = () => {
 
   const saveEscandallo = () => {
       if (currentDish) {
-          // This updates the global state dish, including financials AND the top-level cost/price fields
-          // to sync back with Task 3.
+          // This updates the global state dish
           updateDish({
               ...currentDish,
               cost: currentDish.financials.totalCost, // Sync total cost
-              price: currentDish.financials.salePrice // Sync PVP
+              price: currentDish.price // Sync PVP
           });
-          alert(`¡Escandallo guardado!\n\nSe han actualizado los costes en la Ficha Técnica de "${currentDish.name}".`);
+          alert(`¡Escandallo guardado!\n\nSe han actualizado los datos en la Ficha Técnica de "${currentDish.name}".`);
       }
   };
 
@@ -140,19 +114,19 @@ export const Task5_Financials: React.FC = () => {
              <div className="grid md:grid-cols-2 gap-8 mt-6">
                 <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
                     <h4 className="font-bold text-blue-900 mt-0">¿Cómo funciona?</h4>
-                    <p className="text-sm mb-2">Esta herramienta conecta directamente con tus fichas de la Tarea 3.</p>
+                    <p className="text-sm mb-2">Esta herramienta es una hoja de trabajo manual.</p>
                     <ol className="text-sm list-decimal pl-5 space-y-2">
                         <li>Selecciona uno de tus platos.</li>
-                        <li>Verás que los <strong>Ingredientes, Cantidades y Unidades</strong> aparecen automáticamente (vienen de la ficha).</li>
-                        <li>Tu trabajo es introducir el <strong>Precio Unitario</strong> de mercado para cada ingrediente.</li>
-                        <li>El sistema calculará los costes automáticamente.</li>
-                        <li>Finalmente, ajusta el <strong>PVP (Precio de Venta)</strong> hasta obtener una rentabilidad adecuada.</li>
+                        <li>Introduce el <strong>Precio Unitario</strong> de mercado para cada ingrediente.</li>
+                        <li><strong>Calcula tú mismo</strong> la suma total de los costes y escríbela en la casilla correspondiente.</li>
+                        <li>Realiza las operaciones matemáticas necesarias para hallar el Coste por Ración, el Food Cost % y el Margen Bruto.</li>
+                        <li>Introduce los resultados en las casillas azules del pie de página.</li>
                     </ol>
                 </div>
-                <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
-                    <h4 className="font-bold text-green-900 mt-0">Sincronización Automática</h4>
+                <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-500">
+                    <h4 className="font-bold text-yellow-900 mt-0">Ejercicio Práctico</h4>
                     <p className="text-sm">
-                        Al pulsar "Guardar Escandallo", los valores de <strong>Coste y PVP se actualizarán automáticamente en tu Ficha Técnica</strong> (Tarea 3), completando así la documentación del plato.
+                        La aplicación <strong>NO calculará los totales automáticamente</strong>. Debes demostrar que entiendes de dónde sale cada cifra realizando las sumas y divisiones pertinentes.
                     </p>
                 </div>
              </div>
@@ -257,14 +231,14 @@ export const Task5_Financials: React.FC = () => {
                                         <span className="absolute top-0 right-1 text-[10px] text-gray-400 h-full flex items-center pointer-events-none">€</span>
                                     </div>
 
-                                    {/* COSTE CALCULATED */}
+                                    {/* COSTE CALCULATED (Still auto for rows to avoid tedium, but totals are manual) */}
                                     <div className="flex-[0.75] h-full flex items-center justify-end pr-4 font-mono bg-gray-50 text-gray-800">
                                         {(ing.totalCost || 0).toFixed(2)}
                                     </div>
                                 </div>
                             ))}
                             
-                            {/* Empty rows filler to maintain visual height if few ingredients */}
+                            {/* Empty rows filler */}
                             {Array.from({ length: Math.max(0, 10 - currentDish.ingredients.length) }).map((_, i) => (
                                 <div key={`empty-${i}`} className="flex border-b border-black h-10 bg-white">
                                     <div className="flex-[2] border-r border-black"></div>
@@ -276,55 +250,90 @@ export const Task5_Financials: React.FC = () => {
                             ))}
                         </div>
 
-                        {/* TOTALS SECTION (BLUE FOOTER) */}
+                        {/* TOTALS SECTION (MANUAL INPUTS NOW) */}
                         <div className="bg-[#bfdbfe] border-t-2 border-black text-sm text-black">
                             
                             {/* Row 1: Total Cost */}
                             <div className="flex border-b border-black h-10 items-center">
-                                <div className="flex-1 pl-3 font-medium">Coste total de la materia prima</div>
-                                <div className="w-32 text-right pr-4 font-bold bg-white h-full flex items-center justify-end border-l border-black">
-                                    {currentDish.financials.totalCost.toFixed(2)} €
+                                <div className="flex-1 pl-3 font-medium">Coste total de la materia prima (Suma)</div>
+                                <div className="w-32 h-full border-l border-black relative">
+                                    <input 
+                                        type="number"
+                                        className="w-full h-full text-right pr-6 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-900 placeholder-gray-300"
+                                        placeholder="0.00"
+                                        value={currentDish.financials.totalCost || ''}
+                                        onChange={(e) => handleFinancialInput('totalCost', parseFloat(e.target.value) || 0)}
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">€</span>
                                 </div>
                             </div>
                             
                             {/* Row 2: Cost Per Serving */}
                             <div className="flex border-b border-black h-10 items-center">
-                                <div className="flex-1 pl-3 font-medium">Coste por ración</div>
-                                <div className="w-32 text-right pr-4 font-bold bg-white h-full flex items-center justify-end border-l border-black">
-                                    {currentDish.financials.costPerServing.toFixed(2)} €
+                                <div className="flex-1 pl-3 font-medium">Coste por ración (Total / Nº Raciones)</div>
+                                <div className="w-32 h-full border-l border-black relative">
+                                    <input 
+                                        type="number"
+                                        className="w-full h-full text-right pr-6 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-900 placeholder-gray-300"
+                                        placeholder="0.00"
+                                        value={currentDish.financials.costPerServing || ''}
+                                        onChange={(e) => handleFinancialInput('costPerServing', parseFloat(e.target.value) || 0)}
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">€</span>
                                 </div>
                             </div>
 
                             {/* Row 3: Food Cost % */}
                             <div className="flex border-b border-black h-10 items-center">
-                                <div className="flex-1 pl-3 font-medium">% Food cost</div>
-                                <div className={`w-32 text-right pr-4 font-bold bg-white h-full flex items-center justify-end border-l border-black ${
-                                    currentDish.financials.foodCostPercent > 35 ? 'text-red-600' : 'text-green-700'
-                                }`}>
-                                    {currentDish.financials.foodCostPercent.toFixed(2)} %
+                                <div className="flex-1 pl-3 font-medium">% Food cost (Coste Ración / PVP * 100)</div>
+                                <div className="w-32 h-full border-l border-black relative">
+                                    <input 
+                                        type="number"
+                                        className={`w-full h-full text-right pr-6 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold placeholder-gray-300 ${
+                                            (currentDish.financials.foodCostPercent || 0) > 35 ? 'text-red-600' : 'text-green-700'
+                                        }`}
+                                        placeholder="0.00"
+                                        value={currentDish.financials.foodCostPercent || ''}
+                                        onChange={(e) => handleFinancialInput('foodCostPercent', parseFloat(e.target.value) || 0)}
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">%</span>
                                 </div>
                             </div>
 
                             {/* Row 4: Gross Margin */}
                             <div className="flex border-b border-black h-10 items-center">
-                                <div className="flex-1 pl-3 font-medium">Margen bruto de explotación</div>
-                                <div className="w-32 text-right pr-4 font-bold bg-white h-full flex items-center justify-end border-l border-black">
-                                    {currentDish.financials.grossMargin.toFixed(2)} €
+                                <div className="flex-1 pl-3 font-medium">Margen bruto de explotación (PVP - Coste Ración)</div>
+                                <div className="w-32 h-full border-l border-black relative">
+                                    <input 
+                                        type="number"
+                                        className="w-full h-full text-right pr-6 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-900 placeholder-gray-300"
+                                        placeholder="0.00"
+                                        value={currentDish.financials.grossMargin || ''}
+                                        onChange={(e) => handleFinancialInput('grossMargin', parseFloat(e.target.value) || 0)}
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">€</span>
                                 </div>
                             </div>
                             
                             {/* Row 5: Gross Margin % */}
                             <div className="flex border-b border-black h-10 items-center">
                                 <div className="flex-1 pl-3 font-medium">% Margen bruto de explotación</div>
-                                <div className="w-32 text-right pr-4 font-bold bg-white h-full flex items-center justify-end border-l border-black">
-                                    {currentDish.financials.grossMarginPercent.toFixed(2)} %
+                                <div className="w-32 h-full border-l border-black relative">
+                                    <input 
+                                        type="number"
+                                        className="w-full h-full text-right pr-6 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-900 placeholder-gray-300"
+                                        placeholder="0.00"
+                                        value={currentDish.financials.grossMarginPercent || ''}
+                                        onChange={(e) => handleFinancialInput('grossMarginPercent', parseFloat(e.target.value) || 0)}
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">%</span>
                                 </div>
                             </div>
 
                             {/* Row 6: Calculated Sale Price (Informational) */}
                             <div className="flex border-b border-black h-10 items-center">
-                                <div className="flex-1 pl-3 font-medium text-gray-500 italic">Precio de venta calculado (Sugerido para 30% FC)</div>
-                                <div className="w-32 text-right pr-4 text-gray-500 italic bg-white h-full flex items-center justify-end border-l border-black">
+                                <div className="flex-1 pl-3 font-medium text-gray-600 italic">Precio Teórico Sugerido (Coste Ración * 3.33)</div>
+                                <div className="w-32 text-right pr-4 text-gray-500 italic bg-gray-50 h-full flex items-center justify-end border-l border-black">
                                     {(currentDish.financials.costPerServing * 3.33).toFixed(2)} €
                                 </div>
                             </div>
