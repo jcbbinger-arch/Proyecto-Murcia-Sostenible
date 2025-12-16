@@ -222,7 +222,7 @@ export const Landing: React.FC = () => {
                 <p className="text-[10px] font-bold text-purple-300 uppercase tracking-widest mb-2">Created By</p>
                 <div className="bg-[#0f172a] rounded-xl p-3 flex items-center gap-3 shadow-lg border border-gray-700">
                     <div className="bg-white p-0.5 rounded-full w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden">
-                        <img src="https://drive.google.com/uc?export=view&id=1DkCOqFGdw3PZbyNUnTQNgeaAGjBfv1_e" alt="JCB Logo" className="w-full h-full object-contain" />
+                        <img src="https://lh3.googleusercontent.com/d/1DkCOqFGdw3PZbyNUnTQNgeaAGjBfv1_e" alt="JCB Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-col flex overflow-hidden text-left">
                         <span className="text-white font-bold text-sm leading-tight">Juan Codina</span>

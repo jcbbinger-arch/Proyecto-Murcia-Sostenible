@@ -108,8 +108,8 @@ export const FinalMemory: React.FC = () => {
             <p className="text-3xl text-gray-600 italic font-serif mb-12">"{state.concept.slogan || "Tu eslogan aquí"}"</p>
             
             {state.groupPhoto && (
-                <div className="my-12 flex justify-center">
-                    <img src={state.groupPhoto} alt="Equipo" className="max-w-2xl w-full h-auto object-cover rounded shadow-lg border-4 border-white" />
+                <div className="my-8 flex justify-center">
+                    <img src={state.groupPhoto} alt="Imagen Representativa" className="h-48 w-auto object-contain rounded-lg shadow-sm border-2 border-white" />
                 </div>
             )}
 
