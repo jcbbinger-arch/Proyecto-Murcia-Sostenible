@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Printer, AlertTriangle, User } from 'lucide-react';
+import { Printer, AlertTriangle, User, Scale } from 'lucide-react';
 import { DishType } from '../types';
 
 export const FinalMemory: React.FC = () => {
@@ -21,11 +21,9 @@ export const FinalMemory: React.FC = () => {
   ];
 
   const AuthorBlock: React.FC<{ children: React.ReactNode, authorIds: string[], label?: string }> = ({ children, authorIds, label }) => {
-      // Find the index of the first author in the team list to assign a consistent color
       const firstAuthorId = authorIds[0];
       const memberIndex = state.team.findIndex(m => m.id === firstAuthorId);
       
-      // Fallback style if member not found or generic
       const style = memberIndex >= 0 
         ? MEMBER_STYLES[memberIndex % MEMBER_STYLES.length] 
         : { bg: 'bg-gray-50', border: 'border-gray-400', badge: 'bg-gray-200 text-gray-800', text: 'text-gray-900' };
@@ -36,14 +34,14 @@ export const FinalMemory: React.FC = () => {
         .join(', ');
 
       return (
-          <div className={`mb-8 break-inside-avoid rounded-r-xl border-l-8 p-6 shadow-sm print:shadow-none ${style.bg} ${style.border}`}>
+          <div className={`mb-8 break-inside-avoid rounded-r-xl border-l-8 p-6 shadow-sm print:shadow-none print:border-l-[6px] ${style.bg} ${style.border}`}>
               <div className="flex justify-between items-center mb-4 border-b border-black/10 pb-2">
                   <div className="flex items-center gap-2">
                       <span className={`text-xs font-bold uppercase tracking-widest opacity-60 ${style.text}`}>
                           {label || 'Contribución Realizada Por:'}
                       </span>
                   </div>
-                  <div className={`px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-wide border border-black/5 flex items-center gap-2 ${style.badge}`}>
+                  <div className={`px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-wide border border-black/5 flex items-center gap-2 print:border print:bg-gray-100 ${style.badge}`}>
                       <User size={14} /> {authorNames || 'Sin Asignar'}
                   </div>
               </div>
@@ -57,7 +55,7 @@ export const FinalMemory: React.FC = () => {
   const PendingBlock: React.FC<{ assigneeIds: string[], taskName: string }> = ({ assigneeIds, taskName }) => {
       const assignees = state.team.filter(m => assigneeIds.includes(m.id)).map(m => m.name).join(', ');
       return (
-          <div className="border-2 border-dashed border-red-300 bg-red-50 p-6 rounded-lg my-4 text-center break-inside-avoid">
+          <div className="border-2 border-dashed border-red-300 bg-red-50 p-6 rounded-lg my-4 text-center break-inside-avoid print:border-red-500">
               <AlertTriangle className="mx-auto text-red-400 mb-2" size={32} />
               <h4 className="font-bold text-red-800 uppercase text-sm">Sección Pendiente de Entrega</h4>
               <p className="text-red-600 text-sm font-medium">{taskName}</p>
@@ -70,6 +68,16 @@ export const FinalMemory: React.FC = () => {
 
   return (
     <div className="p-8 max-w-5xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">
+      <style>{`
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .break-after-page { page-break-after: always; }
+            .break-before-page { page-break-before: always; }
+            .break-inside-avoid { page-break-inside: avoid; }
+            a[href]:after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
+        }
+      `}</style>
+
       <div className="flex justify-between items-center mb-8 no-print">
         <h2 className="text-3xl font-bold text-gray-900">Memoria Final del Proyecto</h2>
         <button 
@@ -82,7 +90,7 @@ export const FinalMemory: React.FC = () => {
 
       <div className="bg-white p-12 shadow-lg print:shadow-none print:p-8 min-h-screen print:w-full">
         {/* === PORTADA === */}
-        <div className="flex justify-between items-center border-b-2 border-gray-900 pb-4 mb-16">
+        <div className="flex justify-between items-center border-b-2 border-gray-900 pb-4 mb-16 print:mb-8">
             <div className="flex items-center gap-4">
                 {state.schoolLogo && (
                     <img src={state.schoolLogo} alt="Logo Centro" className="h-20 w-auto object-contain" />
@@ -113,7 +121,7 @@ export const FinalMemory: React.FC = () => {
                     {state.team.map((m, idx) => {
                         const style = MEMBER_STYLES[idx % MEMBER_STYLES.length];
                         return (
-                            <span key={m.id} className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${style.bg} ${style.border} ${style.text}`}>
+                            <span key={m.id} className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${style.bg} ${style.border} ${style.text} print:border-gray-300 print:text-black`}>
                                 {m.name} {m.isCoordinator && '(Coord)'}
                             </span>
                         );
@@ -138,7 +146,8 @@ export const FinalMemory: React.FC = () => {
                     "Capítulo 3: Nuestra Carta Gastronómica",
                     "Capítulo 4: Fichas Técnicas (Anexos)",
                     "Capítulo 5: Diseño y Prototipos Finales",
-                    "Capítulo 6: Viabilidad Económica"
+                    "Capítulo 6: Viabilidad Económica",
+                    "Anexo Confidencial: Coevaluación Diabólica"
                 ].map((chapter, i) => (
                     <li key={i} className="flex justify-between border-b border-gray-100 pb-2">
                         <span className="font-medium">{chapter}</span>
@@ -193,7 +202,7 @@ export const FinalMemory: React.FC = () => {
         {/* === CAPÍTULO 3 === */}
         <section className="mb-16 break-after-page">
             <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 3: La Carta</h2>
-            <div className="border-[6px] double border-gray-800 p-12 max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none">
+            <div className="border-[6px] double border-gray-800 p-12 max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none print:border-4">
                 <div className="text-center border-b-2 border-gray-200 pb-8 mb-8">
                      <h3 className="text-5xl font-serif font-black text-gray-900 mb-2">{state.concept.name}</h3>
                      <p className="text-gray-500 uppercase tracking-widest text-sm">Menú de Temporada</p>
@@ -206,7 +215,7 @@ export const FinalMemory: React.FC = () => {
                     if (dishes.length === 0) return null;
                     return (
                         <div key={type} className="mb-10 break-inside-avoid">
-                            <h4 className="text-center text-sm font-bold uppercase text-white bg-gray-900 py-1 mb-6 mx-auto w-48 rounded-sm">{type}</h4>
+                            <h4 className="text-center text-sm font-bold uppercase text-white bg-gray-900 py-1 mb-6 mx-auto w-48 rounded-sm print:text-black print:border print:bg-white">{type}</h4>
                             <ul className="space-y-6">
                                 {dishes.map(dish => (
                                     <li key={dish.id} className="text-center relative group">
@@ -233,7 +242,7 @@ export const FinalMemory: React.FC = () => {
                             <div className="flex justify-between border-b-2 border-gray-200 pb-4 mb-4">
                                 <div>
                                     <h3 className="font-black text-2xl text-gray-900">{dish.name}</h3>
-                                    <span className="text-sm font-bold text-white bg-gray-500 px-3 py-1 rounded-full uppercase mt-2 inline-block">{dish.type}</span>
+                                    <span className="text-sm font-bold text-white bg-gray-500 px-3 py-1 rounded-full uppercase mt-2 inline-block print:text-black print:border print:bg-gray-100">{dish.type}</span>
                                 </div>
                                 <div className="text-right">
                                      <span className="block text-3xl font-bold text-gray-900">{dish.price}€</span>
@@ -262,16 +271,22 @@ export const FinalMemory: React.FC = () => {
             </div>
         </section>
 
-        {/* === CAPÍTULO 5 === */}
+        {/* === CAPÍTULO 5 (PRODUCTION) === */}
         <section className="mb-16 break-after-page">
              <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 5: Diseño y Prototipos</h2>
              <div className="grid grid-cols-1 gap-8">
                 
+                {/* General Style */}
+                <div className="break-inside-avoid mb-6 bg-gray-50 p-6 rounded border border-gray-200">
+                     <h3 className="font-bold text-xl mb-4 text-gray-900">Identidad Visual General</h3>
+                     <p className="text-gray-800 italic">{state.menuPrototype.generalStyle || "No definida."}</p>
+                </div>
+
                 {/* Digital Menu */}
-                <AuthorBlock authorIds={state.task6.designerIds} label="Diseño Gráfico y Digital">
+                <AuthorBlock authorIds={state.task6.designerIds.length > 0 ? state.task6.designerIds : []} label="Diseño Gráfico y Digital">
                     <div className="h-full">
                         <h3 className="font-bold text-xl mb-4 text-purple-900">Carta Digital (Misión 6.A)</h3>
-                        <div className="bg-purple-50 p-6 rounded border border-purple-100">
+                        <div className="bg-purple-50 p-6 rounded border border-purple-100 print:bg-white print:border-gray-300">
                              <p className="text-sm text-gray-600 mb-2">Enlace al diseño:</p>
                              {state.menuPrototype.digitalLink ? (
                                 <a href={state.menuPrototype.digitalLink} target="_blank" className="text-lg font-bold text-blue-600 underline break-all block">{state.menuPrototype.digitalLink}</a>
@@ -283,19 +298,19 @@ export const FinalMemory: React.FC = () => {
                 </AuthorBlock>
 
                 {/* Physical Menu */}
-                <AuthorBlock authorIds={state.task6.artisanIds} label="Artesanía y Maquetación">
+                <AuthorBlock authorIds={state.task6.artisanIds.length > 0 ? state.task6.artisanIds : []} label="Artesanía y Maquetación">
                     <div className="h-full">
                          <h3 className="font-bold text-xl mb-4 text-orange-900">Carta Física (Misión 6.B)</h3>
                          {state.menuPrototype.physicalPhoto ? (
-                             <div className="grid md:grid-cols-2 gap-6">
+                             <div className="grid md:grid-cols-2 gap-6 break-inside-avoid">
                                 <img src={state.menuPrototype.physicalPhoto} className="w-full h-64 object-cover rounded shadow-md border border-gray-200" />
-                                <div className="bg-orange-50 p-6 rounded border border-orange-100">
+                                <div className="bg-orange-50 p-6 rounded border border-orange-100 print:bg-white print:border-gray-300">
                                     <h4 className="font-bold text-sm uppercase text-orange-800 mb-2">Descripción del Formato</h4>
                                     <p className="text-gray-800">{state.menuPrototype.physicalDescription}</p>
                                 </div>
                              </div>
                          ) : (
-                             <PendingBlock assigneeIds={state.task6.artisanIds} taskName="Misión 6.B: Maqueta Física" />
+                             <div className="p-4 bg-gray-100 text-gray-500 italic text-center">Sin prototipo físico registrado.</div>
                          )}
                     </div>
                 </AuthorBlock>
@@ -303,14 +318,14 @@ export const FinalMemory: React.FC = () => {
         </section>
 
         {/* === CAPÍTULO 6 === */}
-        <section className="mb-12">
+        <section className="mb-12 break-after-page">
             <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 6: Viabilidad Económica</h2>
             <div className="space-y-12">
                 {state.dishes.map((dish) => (
                     <div key={dish.id} className="break-inside-avoid">
                         <AuthorBlock authorIds={[dish.author]} label={`Responsable Financiero: ${dish.name}`}>
                              {/* Simplified Escandallo View for Memory */}
-                             <div className="border-4 border-black bg-white p-6 shadow-sm">
+                             <div className="border-4 border-black bg-white p-6 shadow-sm print:border-2">
                                 <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-4">
                                      <h3 className="text-xl font-black uppercase">Escandallo: {dish.name}</h3>
                                      <span className="font-mono text-xs">REF-{dish.id.substring(0,4)}</span>
@@ -326,7 +341,7 @@ export const FinalMemory: React.FC = () => {
                                             <span>Nº Raciones:</span>
                                             <span className="font-bold">{dish.servings}</span>
                                         </div>
-                                        <div className="flex justify-between border-b border-gray-200 pb-1 bg-yellow-50 px-2 -mx-2">
+                                        <div className="flex justify-between border-b border-gray-200 pb-1 bg-yellow-50 px-2 -mx-2 print:bg-gray-100">
                                             <span className="font-bold text-gray-900">Coste por Ración:</span>
                                             <span className="font-bold text-gray-900">{dish.financials?.costPerServing?.toFixed(2)}€</span>
                                         </div>
@@ -342,7 +357,7 @@ export const FinalMemory: React.FC = () => {
                                             <span>Margen Bruto:</span>
                                             <span className="font-bold">{dish.financials?.grossMargin?.toFixed(2)}€</span>
                                         </div>
-                                        <div className="flex justify-between items-center bg-gray-900 text-white p-2 rounded mt-2">
+                                        <div className="flex justify-between items-center bg-gray-900 text-white p-2 rounded mt-2 print:bg-black print:text-white">
                                             <span className="font-bold uppercase text-xs">PVP Final:</span>
                                             <span className="font-black text-xl">{dish.price?.toFixed(2)}€</span>
                                         </div>
@@ -358,6 +373,75 @@ export const FinalMemory: React.FC = () => {
                     </div>
                 ))}
             </div>
+        </section>
+
+        {/* === ANEXO: COEVALUACIÓN === */}
+        <section className="mb-12 break-before-page">
+            <h2 className="text-4xl font-bold text-red-900 mb-8 border-b-4 border-red-500 pb-4 flex items-center gap-4">
+                <Scale size={40} />
+                Anexo Confidencial: Coevaluación Diabólica
+            </h2>
+            <div className="bg-red-50 p-6 mb-8 border border-red-200 rounded print:bg-gray-50">
+                <p className="text-sm text-red-800 font-bold">
+                    ATENCIÓN PROFESOR/COORDINADOR: Este anexo contiene las valoraciones cruzadas entre los miembros del equipo.
+                </p>
+            </div>
+
+            {state.coEvaluations.length === 0 ? (
+                <p className="text-center text-gray-400 italic">No se han registrado coevaluaciones.</p>
+            ) : (
+                <div className="space-y-6">
+                    {state.coEvaluations.map((review, idx) => {
+                        const evaluator = state.team.find(m => m.id === review.evaluatorId)?.name || 'Desconocido';
+                        const target = state.team.find(m => m.id === review.targetId)?.name || 'Desconocido';
+                        const totalScore = 
+                            review.items.participation.score + 
+                            review.items.responsibility.score + 
+                            review.items.collaboration.score + 
+                            review.items.contribution.score;
+
+                        return (
+                            <div key={idx} className="border border-gray-300 rounded-lg p-6 bg-white break-inside-avoid shadow-sm">
+                                <div className="flex justify-between items-center border-b pb-4 mb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-sm">
+                                            <span className="font-bold text-gray-500 uppercase text-xs">Evaluador:</span>
+                                            <div className="font-bold text-lg">{evaluator}</div>
+                                        </div>
+                                        <div className="text-gray-400">➔</div>
+                                        <div className="text-sm">
+                                            <span className="font-bold text-gray-500 uppercase text-xs">Evaluado:</span>
+                                            <div className="font-bold text-lg">{target}</div>
+                                        </div>
+                                    </div>
+                                    <div className={`px-4 py-2 rounded font-black text-xl border ${totalScore >= 0 ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'}`}>
+                                        {totalScore > 0 ? '+' : ''}{totalScore} Pts
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div className="bg-gray-50 p-3 rounded">
+                                        <span className="font-bold block text-xs uppercase mb-1">Participación ({review.items.participation.score})</span>
+                                        <p className="italic text-gray-700">"{review.items.participation.justification}"</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-3 rounded">
+                                        <span className="font-bold block text-xs uppercase mb-1">Responsabilidad ({review.items.responsibility.score})</span>
+                                        <p className="italic text-gray-700">"{review.items.responsibility.justification}"</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-3 rounded">
+                                        <span className="font-bold block text-xs uppercase mb-1">Colaboración ({review.items.collaboration.score})</span>
+                                        <p className="italic text-gray-700">"{review.items.collaboration.justification}"</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-3 rounded">
+                                        <span className="font-bold block text-xs uppercase mb-1">Aportación Final ({review.items.contribution.score})</span>
+                                        <p className="italic text-gray-700">"{review.items.contribution.justification}"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
         </section>
         
         {/* Footer */}

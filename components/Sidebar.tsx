@@ -161,10 +161,24 @@ export const Sidebar: React.FC = () => {
 
         <button 
             onClick={resetProject}
-            className="w-full text-[10px] text-red-400 hover:text-red-600 hover:underline text-center"
+            className="w-full text-[10px] text-red-400 hover:text-red-600 hover:underline text-center mb-4"
         >
             Reiniciar Proyecto
         </button>
+
+        {/* AUTHOR BADGE */}
+        <div className="pt-3 border-t border-gray-100 flex flex-col items-center">
+            <p className="text-[10px] font-bold text-purple-900 uppercase tracking-widest mb-1.5">Created By</p>
+            <div className="bg-[#0f172a] rounded-xl p-2.5 flex items-center gap-3 w-full shadow-md border border-gray-700">
+                <div className="bg-white p-0.5 rounded-full w-9 h-9 flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src="https://drive.google.com/uc?export=view&id=1DkCOqFGdw3PZbyNUnTQNgeaAGjBfv1_e" alt="JCB Logo" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex-col flex overflow-hidden">
+                    <span className="text-white font-bold text-xs leading-tight">Juan Codina</span>
+                    <span className="text-gray-400 text-[9px] truncate">Original Design & Dev</span>
+                </div>
+            </div>
+        </div>
       </div>
     </aside>
   );

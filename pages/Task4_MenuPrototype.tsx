@@ -1,10 +1,14 @@
+
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Palette, ExternalLink, Upload, PenTool, Layout } from 'lucide-react';
+import { Palette, ExternalLink, Upload, PenTool, Layout, Eye } from 'lucide-react';
 
 export const Task4_MenuPrototype: React.FC = () => {
   const { state, updateMenuPrototype } = useProject();
   const [activeTab, setActiveTab] = useState<'instructions' | 'development'>('instructions');
+
+  // Logic to determine if user is coordinator
+  const isCoordinator = state.currentUser ? state.team.find(m => m.id === state.currentUser)?.isCoordinator : false;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,6 +88,15 @@ export const Task4_MenuPrototype: React.FC = () => {
       {activeTab === 'development' && (
         <div className="space-y-8">
             
+            {isCoordinator && (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg flex items-center gap-3">
+                    <Eye className="text-blue-600" />
+                    <p className="text-sm text-blue-800">
+                        <strong>Modo Coordinador:</strong> Tienes acceso total para ver y editar los prototipos de tu equipo para supervisar la entrega.
+                    </p>
+                </div>
+            )}
+
             {/* General Style */}
             <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">

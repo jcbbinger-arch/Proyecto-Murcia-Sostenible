@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, IngredientRow } from '../types';
-import { BookOpen, Calculator, Save, AlertTriangle, Lock } from 'lucide-react';
+import { BookOpen, Calculator, Save, AlertTriangle, Lock, Eye } from 'lucide-react';
 
 export const Task5_Financials: React.FC = () => {
   const { state, updateDish } = useProject();
@@ -10,17 +10,22 @@ export const Task5_Financials: React.FC = () => {
   const [selectedDishId, setSelectedDishId] = useState<string>('');
   const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 
-  // Filter dishes: Only show those created by the current user
-  const myDishes = state.dishes.filter(d => d.author === state.currentUser);
+  // Logic: Coordinators can see ALL dishes. Members can only see THEIR dishes.
+  const isCoordinator = state.currentUser ? state.team.find(m => m.id === state.currentUser)?.isCoordinator : false;
+  
+  // Filter dishes based on role
+  const availableDishes = isCoordinator 
+    ? state.dishes // Coordinator sees all
+    : state.dishes.filter(d => d.author === state.currentUser); // Members see theirs
 
   // Load selected dish data into local state for editing
   useEffect(() => {
     if (selectedDishId) {
       const dish = state.dishes.find(d => d.id === selectedDishId);
-      // Extra security check: ensure author matches
-      if (dish && dish.author === state.currentUser) {
-        // Ensure ingredients have proper numeric values
-        // We keep the row calculation (Quantity * Price) as a helper, but totals are manual
+      
+      // Security check: if not coordinator, must be author
+      if (dish && (isCoordinator || dish.author === state.currentUser)) {
+        
         const ingredientsWithFinancials = dish.ingredients.map(ing => ({
             ...ing,
             quantity: ing.quantity || 0, // Enforce existing quantity
@@ -38,10 +43,7 @@ export const Task5_Financials: React.FC = () => {
     } else {
       setCurrentDish(null);
     }
-  }, [selectedDishId, state.dishes, state.currentUser]);
-
-  // REMOVED: The useEffect that automatically calculated totals based on ingredients.
-  // Now students must enter these values manually.
+  }, [selectedDishId, state.dishes, state.currentUser, isCoordinator]);
 
   const handleUnitPriceChange = (id: string, value: number) => {
     if (!currentDish) return;
@@ -49,7 +51,6 @@ export const Task5_Financials: React.FC = () => {
     const updatedIngredients = currentDish.ingredients.map(ing => {
         if (ing.id === id) {
             const newPrice = value;
-            // We still auto-calculate the ROW total (Quantity * Price) for convenience
             return { 
                 ...ing, 
                 unitPrice: newPrice,
@@ -124,20 +125,20 @@ export const Task5_Financials: React.FC = () => {
                     <p className="text-sm mb-2">Cada miembro del equipo es responsable de sus propios platos.</p>
                     <p className="text-sm text-blue-800 italic font-bold">
                         <Lock size={14} className="inline mr-1" />
-                        Solo podrás ver y editar los escandallos de los platos que tú has creado en la Tarea 3.
+                        Solo podrás editar los escandallos de los platos que tú has creado.
                     </p>
                 </div>
                 <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-500">
-                    <h4 className="font-bold text-yellow-900 mt-0">Ejercicio Práctico</h4>
+                    <h4 className="font-bold text-yellow-900 mt-0">Supervisión (Coordinador)</h4>
                     <p className="text-sm">
-                        La aplicación <strong>NO calculará los totales automáticamente</strong>. Debes demostrar que entiendes de dónde sale cada cifra realizando las sumas y divisiones pertinentes.
+                        El coordinador tiene acceso de <strong>lectura/edición</strong> a todos los platos para verificar que los cálculos son correctos antes de la entrega final.
                     </p>
                 </div>
              </div>
              
              <div className="flex justify-center mt-8">
                  <button onClick={() => setActiveTab('calculator')} className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow hover:bg-green-700">
-                    Comenzar Mis Escandallos
+                    Comenzar Escandallos
                  </button>
              </div>
         </div>
@@ -148,16 +149,23 @@ export const Task5_Financials: React.FC = () => {
             {/* Dish Selector */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6 flex flex-col md:flex-row items-center gap-4 shadow-sm">
                 <div className="flex-1">
-                    <label className="font-bold text-gray-700 block mb-2">Selecciona TUS Platos:</label>
+                    <label className="font-bold text-gray-700 block mb-2">
+                        {isCoordinator ? "Supervisar Platos (Todos):" : "Selecciona TUS Platos:"}
+                    </label>
                     <select 
                         className="w-full p-3 border border-gray-300 rounded-lg text-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
                         value={selectedDishId}
                         onChange={(e) => setSelectedDishId(e.target.value)}
                     >
-                        <option value="">-- Seleccionar de MI Carta --</option>
-                        {myDishes.map(d => (
-                            <option key={d.id} value={d.id}>{d.name} ({d.type})</option>
-                        ))}
+                        <option value="">-- Seleccionar Plato --</option>
+                        {availableDishes.map(d => {
+                            const authorName = state.team.find(m => m.id === d.author)?.name || "Desconocido";
+                            return (
+                                <option key={d.id} value={d.id}>
+                                    {d.name} ({d.type}) {isCoordinator ? `- por ${authorName}` : ''}
+                                </option>
+                            );
+                        })}
                     </select>
                 </div>
                 {selectedDishId && currentDish && (
@@ -167,17 +175,23 @@ export const Task5_Financials: React.FC = () => {
                 )}
             </div>
 
+            {isCoordinator && selectedDishId && (
+                <div className="bg-blue-50 p-3 rounded border border-blue-200 text-blue-800 text-sm mb-4 flex items-center gap-2">
+                    <Eye size={16}/> Estás visualizando este plato en modo supervisión.
+                </div>
+            )}
+
             {!state.currentUser ? (
                 <div className="text-center py-20 bg-red-50 border-2 border-red-200 rounded-xl">
                     <AlertTriangle size={64} className="mx-auto text-red-400 mb-6" />
                     <h3 className="text-xl font-bold text-red-800">Identificación Requerida</h3>
                     <p className="text-red-600 mt-2">Debes identificarte en el Panel Principal para acceder a tus escandallos.</p>
                 </div>
-            ) : myDishes.length === 0 ? (
+            ) : availableDishes.length === 0 ? (
                 <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl">
                     <BookOpen size={64} className="mx-auto text-gray-300 mb-6" />
-                    <h3 className="text-xl font-bold text-gray-500">No tienes platos asignados</h3>
-                    <p className="text-gray-400 mt-2">Ve a la Tarea 3 (Carta) y crea tus fichas técnicas primero.</p>
+                    <h3 className="text-xl font-bold text-gray-500">No hay platos disponibles</h3>
+                    <p className="text-gray-400 mt-2">Ve a la Tarea 3 (Carta) y crea las fichas técnicas primero.</p>
                 </div>
             ) : currentDish ? (
                 <div className="space-y-8 animate-fade-in">

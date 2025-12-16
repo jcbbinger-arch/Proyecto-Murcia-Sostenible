@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -208,12 +209,28 @@ export const Landing: React.FC = () => {
           <p className="text-gray-400 mb-8 text-lg">
             No necesitas registrarte ni instalar nada. Todos los datos se guardan en tu navegador localmente.
           </p>
-          <Link 
-            to="/dashboard" 
-            className="inline-block bg-white text-gray-900 px-12 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
-          >
-            Acceder al Panel de Control
-          </Link>
+          
+          <div className="flex flex-col items-center gap-8">
+            <Link 
+                to="/dashboard" 
+                className="inline-block bg-white text-gray-900 px-12 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
+            >
+                Acceder al Panel de Control
+            </Link>
+
+            <div className="flex flex-col items-center">
+                <p className="text-[10px] font-bold text-purple-300 uppercase tracking-widest mb-2">Created By</p>
+                <div className="bg-[#0f172a] rounded-xl p-3 flex items-center gap-3 shadow-lg border border-gray-700">
+                    <div className="bg-white p-0.5 rounded-full w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden">
+                        <img src="https://drive.google.com/uc?export=view&id=1DkCOqFGdw3PZbyNUnTQNgeaAGjBfv1_e" alt="JCB Logo" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex-col flex overflow-hidden text-left">
+                        <span className="text-white font-bold text-sm leading-tight">Juan Codina</span>
+                        <span className="text-gray-400 text-[10px] truncate">Original Design & Dev</span>
+                    </div>
+                </div>
+            </div>
+          </div>
         </div>
       </section>
 
