@@ -9,9 +9,19 @@
     <style>
       body { font-family: 'Inter', sans-serif; }
       @media print {
+        @page { margin: 1cm; size: A4; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
         .no-print { display: none !important; }
         .print-only { display: block !important; }
-        body { background: white; }
+        
+        /* Critical: Reset the sidebar margin on the main container */
+        main { margin-left: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+        
+        /* Ensure shadows and borders print nicely */
+        * { box-shadow: none !important; text-shadow: none !important; }
+        
+        /* Ensure inputs look like text */
+        input, textarea, select { border: none !important; background: transparent !important; resize: none; appearance: none; padding: 0 !important; }
       }
     </style>
   <script type="importmap">

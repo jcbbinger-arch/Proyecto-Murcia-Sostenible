@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Printer, AlertTriangle, User, Scale } from 'lucide-react';
+import { Printer, AlertTriangle, User, Scale, ExternalLink } from 'lucide-react';
 import { DishType } from '../types';
 
 export const FinalMemory: React.FC = () => {
@@ -70,11 +69,12 @@ export const FinalMemory: React.FC = () => {
     <div className="p-8 max-w-5xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">
       <style>{`
         @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .break-after-page { page-break-after: always; }
             .break-before-page { page-break-before: always; }
             .break-inside-avoid { page-break-inside: avoid; }
             a[href]:after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
+            /* Force images to print */
+            img { max-width: 100% !important; }
         }
       `}</style>
 
@@ -104,7 +104,7 @@ export const FinalMemory: React.FC = () => {
         </div>
 
         <div className="text-center mb-16 border-b-2 border-green-600 pb-12 break-after-page">
-            <h1 className="text-6xl font-black text-green-900 mb-6 tracking-tight">{state.concept.name || "NOMBRE DEL RESTAURANTE"}</h1>
+            <h1 className="text-6xl font-black text-green-900 mb-6 tracking-tight uppercase leading-none">{state.concept.name || "NOMBRE DEL RESTAURANTE"}</h1>
             <p className="text-3xl text-gray-600 italic font-serif mb-12">"{state.concept.slogan || "Tu eslogan aquí"}"</p>
             
             {state.groupPhoto && (
@@ -145,7 +145,7 @@ export const FinalMemory: React.FC = () => {
                     "Capítulo 2: La Investigación (Anexos)",
                     "Capítulo 3: Nuestra Carta Gastronómica",
                     "Capítulo 4: Fichas Técnicas (Anexos)",
-                    "Capítulo 5: Diseño y Prototipos Finales",
+                    "Capítulo 5: Producción Final (Diseño y Prototipos)",
                     "Capítulo 6: Viabilidad Económica",
                     "Anexo Confidencial: Coevaluación Diabólica"
                 ].map((chapter, i) => (
@@ -273,7 +273,7 @@ export const FinalMemory: React.FC = () => {
 
         {/* === CAPÍTULO 5 (PRODUCTION) === */}
         <section className="mb-16 break-after-page">
-             <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 5: Diseño y Prototipos</h2>
+             <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 5: Producción Final</h2>
              <div className="grid grid-cols-1 gap-8">
                 
                 {/* General Style */}
@@ -289,7 +289,9 @@ export const FinalMemory: React.FC = () => {
                         <div className="bg-purple-50 p-6 rounded border border-purple-100 print:bg-white print:border-gray-300">
                              <p className="text-sm text-gray-600 mb-2">Enlace al diseño:</p>
                              {state.menuPrototype.digitalLink ? (
-                                <a href={state.menuPrototype.digitalLink} target="_blank" className="text-lg font-bold text-blue-600 underline break-all block">{state.menuPrototype.digitalLink}</a>
+                                <a href={state.menuPrototype.digitalLink} target="_blank" className="text-lg font-bold text-blue-600 underline break-all block flex items-center gap-2">
+                                    <ExternalLink size={16} /> {state.menuPrototype.digitalLink}
+                                </a>
                             ) : (
                                 <span className="text-red-500 font-bold">No se ha proporcionado el enlace.</span>
                             )}
@@ -303,7 +305,7 @@ export const FinalMemory: React.FC = () => {
                          <h3 className="font-bold text-xl mb-4 text-orange-900">Carta Física (Misión 6.B)</h3>
                          {state.menuPrototype.physicalPhoto ? (
                              <div className="grid md:grid-cols-2 gap-6 break-inside-avoid">
-                                <img src={state.menuPrototype.physicalPhoto} className="w-full h-64 object-cover rounded shadow-md border border-gray-200" />
+                                <img src={state.menuPrototype.physicalPhoto} className="w-full h-64 object-cover rounded shadow-md border border-gray-200" alt="Prototipo Físico" />
                                 <div className="bg-orange-50 p-6 rounded border border-orange-100 print:bg-white print:border-gray-300">
                                     <h4 className="font-bold text-sm uppercase text-orange-800 mb-2">Descripción del Formato</h4>
                                     <p className="text-gray-800">{state.menuPrototype.physicalDescription}</p>

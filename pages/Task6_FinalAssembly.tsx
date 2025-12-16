@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Palette, Hammer, BookOpen, Lock, UserCheck } from 'lucide-react';
+import { Palette, Hammer, BookOpen, Lock, UserCheck, Eye, ExternalLink } from 'lucide-react';
 
 export const Task6_FinalAssembly: React.FC = () => {
   const { state, updateTask6Roles } = useProject();
-  const [activeTab, setActiveTab] = useState<'instructions' | 'roles'>('instructions');
+  const [activeTab, setActiveTab] = useState<'instructions' | 'roles' | 'supervision'>('instructions');
 
   const isCoordinator = state.currentUser ? state.team.find(m => m.id === state.currentUser)?.isCoordinator : true;
   const coordinatorMember = state.team.find(m => m.isCoordinator);
@@ -43,6 +43,14 @@ export const Task6_FinalAssembly: React.FC = () => {
             >
                 Misiones
             </button>
+            {isCoordinator && (
+                <button 
+                    onClick={() => setActiveTab('supervision')}
+                    className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${activeTab === 'supervision' ? 'bg-purple-600 text-white' : 'bg-white text-gray-500 border hover:bg-gray-50'}`}
+                >
+                    <Eye size={18} /> Supervisión
+                </button>
+            )}
         </div>
       </div>
 
@@ -175,6 +183,52 @@ export const Task6_FinalAssembly: React.FC = () => {
                  <p>Una vez asignados los roles, cada miembro debe trabajar en su área (actualizar prototipos en Tarea 4, etc.) y exportar su contribución en la página de <strong>Sincronización</strong>.</p>
              </div>
         </div>
+      )}
+
+      {activeTab === 'supervision' && isCoordinator && (
+          <div className="space-y-6">
+              <div className="bg-white p-8 rounded-xl border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-4">Supervisión de Entregables (Producción Final)</h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-8">
+                      {/* DIGITAL REVIEW */}
+                      <div>
+                          <h4 className="font-bold text-purple-900 mb-2">Carta Digital (Canva)</h4>
+                          <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                              {state.menuPrototype.digitalLink ? (
+                                  <div>
+                                      <p className="text-xs text-gray-500 mb-2">Enlace actual:</p>
+                                      <a href={state.menuPrototype.digitalLink} target="_blank" className="text-blue-600 font-bold flex items-center gap-2 hover:underline">
+                                          <ExternalLink size={16} /> Abrir Diseño
+                                      </a>
+                                  </div>
+                              ) : (
+                                  <p className="text-red-500 italic text-sm">No se ha entregado el enlace.</p>
+                              )}
+                          </div>
+                      </div>
+
+                      {/* PHYSICAL REVIEW */}
+                      <div>
+                          <h4 className="font-bold text-orange-900 mb-2">Carta Física (Prototipo)</h4>
+                          <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                              {state.menuPrototype.physicalPhoto ? (
+                                  <div>
+                                      <img src={state.menuPrototype.physicalPhoto} className="w-full h-48 object-cover rounded mb-2 border" />
+                                      <p className="text-sm text-gray-700 italic">{state.menuPrototype.physicalDescription}</p>
+                                  </div>
+                              ) : (
+                                  <p className="text-red-500 italic text-sm">No se ha subido la foto del prototipo.</p>
+                              )}
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="mt-8 bg-blue-50 p-4 rounded text-blue-800 text-sm">
+                      <p><strong>Nota para el Coordinador:</strong> Si falta información, contacta con los responsables asignados en la pestaña "Misiones".</p>
+                  </div>
+              </div>
+          </div>
       )}
     </div>
   );
