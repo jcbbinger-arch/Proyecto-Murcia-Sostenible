@@ -3,6 +3,29 @@ import { NavLink, Link } from 'react-router-dom';
 import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool } from 'lucide-react';
 import { useProject } from '../context/ProjectContext';
 
+interface NavItemProps {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  colorClass: string;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ to, icon, label, colorClass }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) =>
+      `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1 ${
+        isActive
+          ? colorClass
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      }`
+    }
+  >
+    {icon}
+    {label}
+  </NavLink>
+);
+
 export const Sidebar: React.FC = () => {
   const { state, resetProject } = useProject();
 
@@ -20,22 +43,6 @@ export const Sidebar: React.FC = () => {
     { to: "/task-6", icon: <Rocket size={18} />, label: "7. Producción Final" },
     { to: "/memory", icon: <Printer size={18} />, label: "Memoria Final" },
   ];
-
-  const NavItem = ({ to, icon, label, colorClass }: { to: string, icon: React.ReactNode, label: string, colorClass: string }) => (
-      <NavLink
-        to={to}
-        className={({ isActive }) =>
-          `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1 ${
-            isActive
-              ? colorClass
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-          }`
-        }
-      >
-        {icon}
-        {label}
-      </NavLink>
-  );
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 no-print z-10">
