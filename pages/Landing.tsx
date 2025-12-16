@@ -1,122 +1,222 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChefHat, BookOpen, Calculator, Users, ArrowRight, CheckCircle } from 'lucide-react';
+import { 
+  ChefHat, 
+  BookOpen, 
+  Calculator, 
+  Users, 
+  ArrowRight, 
+  MapPin, 
+  FileText, 
+  Cpu,
+  Target
+} from 'lucide-react';
 
 export const Landing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-green-900 to-green-700 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
-        <div className="max-w-6xl mx-auto px-6 py-24 relative z-10 text-center">
-          <div className="inline-block bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full px-4 py-1 mb-6">
-            <span className="text-green-100 text-sm font-semibold tracking-wide uppercase">Proyecto Fin de Grado / Ciclo</span>
+    <div className="min-h-screen bg-white font-sans text-gray-900">
+      
+      {/* 1. HERO SECTION */}
+      <header className="relative bg-gray-900 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-gray-900/90 z-10"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+        
+        <div className="relative z-20 max-w-7xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/30 rounded-full px-4 py-1.5 mb-8 backdrop-blur-md">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span className="text-green-300 text-xs font-bold tracking-wider uppercase">Herramienta Educativa Oficial</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
-            Murcia <span className="text-green-300">Sostenible</span>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
+            Murcia <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200">Sostenible</span>
           </h1>
-          <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto mb-10 font-light">
-            La plataforma integral para estudiantes de hostelería. Diseña, gestiona y documenta tu proyecto de restauración sostenible paso a paso.
+          
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 font-light leading-relaxed">
+            Tu asistente integral para el <strong>Trabajo de Fin de Grado</strong>. Diseña, gestiona y valida tu proyecto de restauración sostenible desde la idea hasta el escandallo final.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link 
-              to="/dashboard" 
-              className="bg-white text-green-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-transform hover:scale-105 shadow-xl flex items-center justify-center gap-2"
-            >
-              Comenzar Proyecto <ArrowRight size={20} />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <div className="max-w-6xl mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900">Tu compañero digital de proyecto</h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-            Olvídate de documentos dispersos. Esta app centraliza todo el trabajo de tu equipo, desde la idea inicial hasta la memoria final.
+          
+          <Link 
+            to="/dashboard" 
+            className="group relative inline-flex items-center gap-3 bg-green-500 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:bg-green-400 hover:scale-105 shadow-2xl hover:shadow-green-500/20"
+          >
+            Comenzar mi Proyecto
+            <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          
+          <p className="mt-6 text-sm text-gray-500">
+            Optimizada para alumnos de Hostelería y Turismo de la Región de Murcia.
           </p>
         </div>
+      </header>
 
-        <div className="grid md:grid-cols-3 gap-10">
-          <div className="bg-gray-50 p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-6">
-              <Users size={28} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Gestión de Equipos</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Define roles, reparte tareas y colabora. Cada miembro tiene su espacio, pero todos contribuyen al mismo objetivo.
+      {/* 2. EXPLICACIÓN DEL FLUJO (CÓMO FUNCIONA) */}
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Un flujo de trabajo profesional</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              La aplicación te guía a través de las 6 fases críticas de la creación de un restaurante, asegurando que no olvides ningún detalle para tu Memoria Final.
             </p>
           </div>
 
-          <div className="bg-gray-50 p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
-              <ChefHat size={28} />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Paso 1 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Users size={100} />
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6 font-bold text-xl">1</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Equipo y Zona</h3>
+              <p className="text-gray-600">
+                Registra a los miembros de tu equipo, asigna roles (Coordinador, Chef, etc.) y selecciona una de las <strong>10 zonas gastronómicas</strong> de Murcia.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Diseño Gastronómico</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Crea fichas técnicas profesionales, gestiona alérgenos y diseña tu carta basándote en productos locales de Murcia.
-            </p>
-          </div>
 
-          <div className="bg-gray-50 p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-6">
-              <Calculator size={28} />
+            {/* Paso 2 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Target size={100} />
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-6 font-bold text-xl">2</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Análisis y Concepto</h3>
+              <p className="text-gray-600">
+                Realiza investigaciones de mercado asignadas individualmente. Define el nombre, eslogan y valores que harán única tu marca.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Viabilidad Económica</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Calculadora de escandallos integrada. Controla costes, márgenes y fija precios de venta reales y rentables.
-            </p>
+
+            {/* Paso 3 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <ChefHat size={100} />
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-6 font-bold text-xl">3</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Diseño de Carta</h3>
+              <p className="text-gray-600">
+                Crea fichas técnicas detalladas con ingredientes Km0. Incluye fotos, alérgenos y justificación de sostenibilidad.
+              </p>
+            </div>
+
+            {/* Paso 4 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <FileText size={100} />
+              </div>
+              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-pink-600 mb-6 font-bold text-xl">4</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Prototipado</h3>
+              <p className="text-gray-600">
+                Sube enlaces a tu diseño digital (Canva) y fotos de tu maqueta física de la carta. Todo centralizado.
+              </p>
+            </div>
+
+            {/* Paso 5 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Calculator size={100} />
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-6 font-bold text-xl">5</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Finanzas y Escandallos</h3>
+              <p className="text-gray-600">
+                Calculadora integrada de costes. Determina el Food Cost, Margen Bruto y justifica tu PVP de forma automática.
+              </p>
+            </div>
+
+            {/* Paso 6 */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-green-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <BookOpen size={100} />
+              </div>
+              <div className="w-12 h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center mb-6 font-bold text-xl">6</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Memoria Final PDF</h3>
+              <p className="text-gray-600">
+                ¡Magia! Pulsa un botón y la app compilará todo tu trabajo en un documento estructurado listo para entregar e imprimir.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Steps Section */}
-      <div className="bg-gray-900 text-white py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Un flujo de trabajo estructurado</h2>
-              <div className="space-y-6">
-                {[
-                  "Selección de Zona y Equipo",
-                  "Análisis de Mercado y Concepto",
-                  "Diseño de Oferta Gastronómica",
-                  "Prototipado Visual (Carta)",
-                  "Análisis Financiero (Escandallos)",
-                  "Generación de Memoria PDF"
-                ].map((step, idx) => (
-                  <div key={idx} className="flex items-center gap-4">
-                    <CheckCircle className="text-green-400 flex-shrink-0" />
-                    <span className="text-lg text-gray-300">{step}</span>
-                  </div>
-                ))}
+      {/* 3. CARACTERÍSTICAS TÉCNICAS */}
+      <section className="py-24 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Tecnología al servicio de tu creatividad</h2>
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                  <MapPin size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">Base de Datos Regional</h4>
+                  <p className="text-gray-600 text-sm">Información precargada sobre productos e ingredientes de las 10 comarcas de Murcia.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+                  <Cpu size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">Asistente IA Integrado</h4>
+                  <p className="text-gray-600 text-sm">Un chat inteligente te ayuda a mejorar descripciones de platos, sugiere maridajes y revisa tu ortografía.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                  <Users size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">Trabajo Colaborativo</h4>
+                  <p className="text-gray-600 text-sm">Sistema de importación/exportación de archivos JSON para que cada miembro del equipo trabaje en su parte y luego se fusione todo.</p>
+                </div>
               </div>
             </div>
-            <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700">
-               <div className="flex items-center gap-3 mb-6">
-                  <BookOpen className="text-green-400" />
-                  <h3 className="text-xl font-bold">Generación Automática</h3>
-               </div>
-               <p className="text-gray-400 mb-6">
-                 Al finalizar tu trabajo, la aplicación compila toda la información (investigaciones, recetas, justificaciones, equipo) en un documento estructurado listo para imprimir o guardar como PDF.
-               </p>
-               <div className="p-4 bg-gray-900 rounded border border-gray-700 font-mono text-sm text-green-300">
-                  > Generando Índice... OK<br/>
-                  > Compilando Fichas Técnicas... OK<br/>
-                  > Calculando Rentabilidad... OK<br/>
-                  > Memoria Final lista para entrega.
-               </div>
+          </div>
+          <div className="bg-gray-100 rounded-2xl p-8 border border-gray-200 rotate-2 hover:rotate-0 transition-transform duration-500">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+                <div className="flex items-center gap-2 mb-4 border-b pb-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    <span className="text-xs text-gray-400 ml-2">Vista Previa: Escandallo</span>
+                </div>
+                <div className="space-y-3 font-mono text-xs">
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Plato:</span>
+                        <span className="font-bold">Arroz con Conejo y Caracoles</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Coste MP:</span>
+                        <span className="text-red-500">3.45€</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">PVP Sugerido:</span>
+                        <span className="text-blue-600 font-bold">14.50€</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div className="bg-green-500 h-2 rounded-full" style={{width: '24%'}}></div>
+                    </div>
+                    <div className="text-center text-green-600 text-[10px] pt-1">Food Cost: 24% (Óptimo)</div>
+                </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <div className="bg-white border-t border-gray-200 py-8 text-center text-gray-500 text-sm">
-        <p>© {new Date().getFullYear()} C.I.F.P. de Hostelería y Turismo - Región de Murcia</p>
-        <p className="mt-2">Desarrollado para fines educativos.</p>
-      </div>
+      {/* 4. CALL TO ACTION */}
+      <section className="bg-gray-900 text-white py-20 text-center">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">¿Listo para empezar tu proyecto?</h2>
+          <p className="text-gray-400 mb-8 text-lg">
+            No necesitas registrarte ni instalar nada. Todos los datos se guardan en tu navegador localmente.
+          </p>
+          <Link 
+            to="/dashboard" 
+            className="inline-block bg-white text-gray-900 px-12 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
+          >
+            Acceder al Panel de Control
+          </Link>
+        </div>
+      </section>
+
     </div>
   );
 };
