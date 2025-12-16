@@ -48,7 +48,7 @@ export const AcademicGuide: React.FC = () => {
         "e) Se ha integrado el plan de prevención de riesgos laborales y se han previsto los equipos de protección necesarios.",
         "f) Se han asignado recursos humanos y materiales específicos a cada tarea.",
         "g) Se han contemplado posibles contingencias o imprevistos.",
-        "h) Se han diseñado medidas correctivas para hacer frente a dichos imprevistos.",
+        "h) Se ha diseñado medidas correctivas para hacer frente a dichos imprevistos.",
         "i) Se ha elaborado toda la documentación técnica y administrativa requerida."
       ]
     },
@@ -121,11 +121,10 @@ export const AcademicGuide: React.FC = () => {
     }
   ];
 
-  // Helper function to generate official UN ODS image URLs
+  // Helper function to generate ODS image URLs based on the UAM pattern
   const getODSImage = (id: number) => {
-      const paddedId = id < 10 ? `0${id}` : `${id}`;
-      // Official UN Spanish icons URL pattern
-      return `https://www.un.org/sustainabledevelopment/es/wp-content/uploads/sites/3/2018/08/S_SDG_goals_icons-individual-rgb-${paddedId}.png`;
+      // Using UAM pattern as requested: https://ods.uam.es/wp-content/uploads/2020/08/ODS-1-300x300.png
+      return `https://ods.uam.es/wp-content/uploads/2020/08/ODS-${id}-300x300.png`;
   };
 
   const ODS_LIST = Array.from({ length: 17 }, (_, i) => ({
@@ -253,8 +252,12 @@ export const AcademicGuide: React.FC = () => {
                         <img 
                             src={ods.image} 
                             alt={`ODS ${ods.id}`} 
-                            className="w-full h-auto rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
+                            className="w-full h-auto rounded-lg shadow-md hover:scale-105 transition-transform duration-300 bg-gray-100"
                             loading="lazy"
+                            onError={(e) => {
+                                // Fallback to a placeholder or generic image if UAM link fails
+                                (e.target as HTMLImageElement).src = `https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/ODS_${ods.id < 10 ? '0' : ''}${ods.id}.svg/240px-ODS_${ods.id < 10 ? '0' : ''}${ods.id}.svg.png`; 
+                            }}
                         />
                     </div>
                 ))}
