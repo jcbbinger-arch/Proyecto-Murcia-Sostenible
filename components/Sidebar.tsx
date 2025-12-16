@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool } from 'lucide-react';
+import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool, Scale } from 'lucide-react';
 import { useProject } from '../context/ProjectContext';
 
 interface NavItemProps {
@@ -41,6 +42,7 @@ export const Sidebar: React.FC = () => {
     { to: "/task-4", icon: <Palette size={18} />, label: "5. Prototipos" },
     { to: "/financials", icon: <DollarSign size={18} />, label: "6. Viabilidad" },
     { to: "/task-6", icon: <Rocket size={18} />, label: "7. Producción Final" },
+    { to: "/co-eval", icon: <Scale size={18} />, label: "8. Coevaluación" },
     { to: "/memory", icon: <Printer size={18} />, label: "Memoria Final" },
   ];
 

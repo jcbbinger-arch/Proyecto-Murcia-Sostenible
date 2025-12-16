@@ -1,5 +1,6 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ProjectState, Zone, Dish, TeamMember, MenuPrototype, Task6Roles, DishType } from '../types';
+import { ProjectState, Zone, Dish, TeamMember, MenuPrototype, Task6Roles, DishType, PeerReview } from '../types';
 import { INITIAL_STATE } from '../constants';
 
 interface ProjectContextType {
@@ -23,6 +24,7 @@ interface ProjectContextType {
   updateDish: (dish: Dish) => void;
   updateMenuPrototype: (data: Partial<MenuPrototype>) => void;
   updateTask6Roles: (roles: Partial<Task6Roles>) => void;
+  savePeerReview: (review: PeerReview) => void;
   resetProject: () => void;
 }
 
@@ -48,7 +50,8 @@ const sanitizeState = (loadedData: any): ProjectState => {
         task6: safeTask6,
         menuPrototype: { ...INITIAL_STATE.menuPrototype, ...(loadedData.menuPrototype || {}) },
         dishes: Array.isArray(loadedData.dishes) ? loadedData.dishes : [],
-        team: Array.isArray(loadedData.team) ? loadedData.team : []
+        team: Array.isArray(loadedData.team) ? loadedData.team : [],
+        coEvaluations: Array.isArray(loadedData.coEvaluations) ? loadedData.coEvaluations : []
     };
 };
 
@@ -134,7 +137,15 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
               newState.dishes = updatedDishes;
           }
 
-          // 3. Merge Task 6 Roles work
+          // 3. Merge Co-Evaluations (Add reviews made BY the contributor)
+          if (Array.isArray(incomingState.coEvaluations)) {
+              const incomingReviews = incomingState.coEvaluations.filter(r => r.evaluatorId === memberId);
+              // Remove old reviews by this evaluator to avoid duplicates, then add new ones
+              const existingOthers = newState.coEvaluations.filter(r => r.evaluatorId !== memberId);
+              newState.coEvaluations = [...existingOthers, ...incomingReviews];
+          }
+
+          // 4. Merge Task 6 Roles work
           if (incomingState.menuPrototype) {
               const isDesigner = current.task6.designerIds.includes(memberId);
               const isArtisan = current.task6.artisanIds.includes(memberId);
@@ -240,6 +251,19 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       }));
   }
 
+  const savePeerReview = (review: PeerReview) => {
+      setState(prev => {
+          // Remove previous review for same target by same evaluator if exists
+          const otherReviews = prev.coEvaluations.filter(
+              r => !(r.evaluatorId === review.evaluatorId && r.targetId === review.targetId)
+          );
+          return {
+              ...prev,
+              coEvaluations: [...otherReviews, review]
+          };
+      });
+  };
+
   const resetProject = () => {
     if(confirm("¿Estás seguro de borrar todo el progreso? Esta acción no se puede deshacer.")) {
         localStorage.removeItem('murcia_project_data');
@@ -269,6 +293,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       updateDish,
       updateMenuPrototype,
       updateTask6Roles,
+      savePeerReview,
       resetProject 
     }}>
       {children}

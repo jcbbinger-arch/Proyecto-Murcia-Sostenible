@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Dish, IngredientRow } from '../types';
-import { BookOpen, Calculator, Save, AlertTriangle } from 'lucide-react';
+import { BookOpen, Calculator, Save, AlertTriangle, Lock } from 'lucide-react';
 
 export const Task5_Financials: React.FC = () => {
   const { state, updateDish } = useProject();
@@ -9,11 +10,15 @@ export const Task5_Financials: React.FC = () => {
   const [selectedDishId, setSelectedDishId] = useState<string>('');
   const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 
+  // Filter dishes: Only show those created by the current user
+  const myDishes = state.dishes.filter(d => d.author === state.currentUser);
+
   // Load selected dish data into local state for editing
   useEffect(() => {
     if (selectedDishId) {
       const dish = state.dishes.find(d => d.id === selectedDishId);
-      if (dish) {
+      // Extra security check: ensure author matches
+      if (dish && dish.author === state.currentUser) {
         // Ensure ingredients have proper numeric values
         // We keep the row calculation (Quantity * Price) as a helper, but totals are manual
         const ingredientsWithFinancials = dish.ingredients.map(ing => ({
@@ -27,11 +32,13 @@ export const Task5_Financials: React.FC = () => {
             ...dish,
             ingredients: ingredientsWithFinancials
         });
+      } else {
+          setCurrentDish(null);
       }
     } else {
       setCurrentDish(null);
     }
-  }, [selectedDishId, state.dishes]);
+  }, [selectedDishId, state.dishes, state.currentUser]);
 
   // REMOVED: The useEffect that automatically calculated totals based on ingredients.
   // Now students must enter these values manually.
@@ -113,15 +120,12 @@ export const Task5_Financials: React.FC = () => {
              
              <div className="grid md:grid-cols-2 gap-8 mt-6">
                 <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
-                    <h4 className="font-bold text-blue-900 mt-0">¿Cómo funciona?</h4>
-                    <p className="text-sm mb-2">Esta herramienta es una hoja de trabajo manual.</p>
-                    <ol className="text-sm list-decimal pl-5 space-y-2">
-                        <li>Selecciona uno de tus platos.</li>
-                        <li>Introduce el <strong>Precio Unitario</strong> de mercado para cada ingrediente.</li>
-                        <li><strong>Calcula tú mismo</strong> la suma total de los costes y escríbela en la casilla correspondiente.</li>
-                        <li>Realiza las operaciones matemáticas necesarias para hallar el Coste por Ración, el Food Cost % y el Margen Bruto.</li>
-                        <li>Introduce los resultados en las casillas azules del pie de página.</li>
-                    </ol>
+                    <h4 className="font-bold text-blue-900 mt-0">Responsabilidad Individual</h4>
+                    <p className="text-sm mb-2">Cada miembro del equipo es responsable de sus propios platos.</p>
+                    <p className="text-sm text-blue-800 italic font-bold">
+                        <Lock size={14} className="inline mr-1" />
+                        Solo podrás ver y editar los escandallos de los platos que tú has creado en la Tarea 3.
+                    </p>
                 </div>
                 <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-500">
                     <h4 className="font-bold text-yellow-900 mt-0">Ejercicio Práctico</h4>
@@ -133,7 +137,7 @@ export const Task5_Financials: React.FC = () => {
              
              <div className="flex justify-center mt-8">
                  <button onClick={() => setActiveTab('calculator')} className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow hover:bg-green-700">
-                    Comenzar Escandallos
+                    Comenzar Mis Escandallos
                  </button>
              </div>
         </div>
@@ -144,15 +148,15 @@ export const Task5_Financials: React.FC = () => {
             {/* Dish Selector */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6 flex flex-col md:flex-row items-center gap-4 shadow-sm">
                 <div className="flex-1">
-                    <label className="font-bold text-gray-700 block mb-2">Selecciona un Plato para Escandallar:</label>
+                    <label className="font-bold text-gray-700 block mb-2">Selecciona TUS Platos:</label>
                     <select 
                         className="w-full p-3 border border-gray-300 rounded-lg text-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
                         value={selectedDishId}
                         onChange={(e) => setSelectedDishId(e.target.value)}
                     >
-                        <option value="">-- Seleccionar de la Carta --</option>
-                        {state.dishes.map(d => (
-                            <option key={d.id} value={d.id}>{d.name} ({d.type}) - Autor: {state.team.find(m=>m.id === d.author)?.name}</option>
+                        <option value="">-- Seleccionar de MI Carta --</option>
+                        {myDishes.map(d => (
+                            <option key={d.id} value={d.id}>{d.name} ({d.type})</option>
                         ))}
                     </select>
                 </div>
@@ -163,7 +167,19 @@ export const Task5_Financials: React.FC = () => {
                 )}
             </div>
 
-            {currentDish ? (
+            {!state.currentUser ? (
+                <div className="text-center py-20 bg-red-50 border-2 border-red-200 rounded-xl">
+                    <AlertTriangle size={64} className="mx-auto text-red-400 mb-6" />
+                    <h3 className="text-xl font-bold text-red-800">Identificación Requerida</h3>
+                    <p className="text-red-600 mt-2">Debes identificarte en el Panel Principal para acceder a tus escandallos.</p>
+                </div>
+            ) : myDishes.length === 0 ? (
+                <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl">
+                    <BookOpen size={64} className="mx-auto text-gray-300 mb-6" />
+                    <h3 className="text-xl font-bold text-gray-500">No tienes platos asignados</h3>
+                    <p className="text-gray-400 mt-2">Ve a la Tarea 3 (Carta) y crea tus fichas técnicas primero.</p>
+                </div>
+            ) : currentDish ? (
                 <div className="space-y-8 animate-fade-in">
                     
                     {/* === ESCANDALLO SHEET (EXACT REPLICA START) === */}
@@ -371,7 +387,7 @@ export const Task5_Financials: React.FC = () => {
                 <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl">
                     <Calculator size={64} className="mx-auto text-gray-300 mb-6" />
                     <h3 className="text-xl font-bold text-gray-500">Ningún plato seleccionado</h3>
-                    <p className="text-gray-400 mt-2">Elige un plato del menú superior para cargar sus ingredientes.</p>
+                    <p className="text-gray-400 mt-2">Elige un plato del menú superior para empezar.</p>
                 </div>
             )}
         </div>

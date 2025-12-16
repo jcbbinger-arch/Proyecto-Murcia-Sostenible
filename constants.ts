@@ -1,3 +1,4 @@
+
 import { Zone, MicroTask, ProjectState } from './types';
 
 export const ZONES: Zone[] = [
@@ -138,5 +139,6 @@ export const INITIAL_STATE: ProjectState = {
     artisanIds: [],
     editorIds: []
   },
-  team: []
+  team: [],
+  coEvaluations: []
 };

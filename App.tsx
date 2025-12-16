@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ProjectProvider } from './context/ProjectContext';
@@ -16,6 +17,7 @@ import { Task6_FinalAssembly } from './pages/Task6_FinalAssembly';
 import { TeamSync } from './pages/TeamSync';
 import { FinalMemory } from './pages/FinalMemory';
 import { AcademicGuide } from './pages/AcademicGuide';
+import { CoEvaluation } from './pages/CoEvaluation';
 
 // Layout wrapper to conditionally show Sidebar and Chat
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -54,6 +56,7 @@ function App() {
             <Route path="/task-4" element={<Task4_MenuPrototype />} />
             <Route path="/financials" element={<Task5_Financials />} />
             <Route path="/task-6" element={<Task6_FinalAssembly />} />
+            <Route path="/co-eval" element={<CoEvaluation />} />
             <Route path="/memory" element={<FinalMemory />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

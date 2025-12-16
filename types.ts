@@ -1,3 +1,4 @@
+
 export interface Zone {
   id: number;
   name: string;
@@ -83,6 +84,24 @@ export interface Task6Roles {
   editorIds: string[];   // Changed to array
 }
 
+// --- NEW CO-EVALUATION TYPES ---
+export interface RubricItem {
+  score: number; // 0.5 or -0.5
+  justification: string;
+}
+
+export interface PeerReview {
+  evaluatorId: string;
+  targetId: string;
+  timestamp: number;
+  items: {
+      participation: RubricItem;
+      responsibility: RubricItem;
+      collaboration: RubricItem;
+      contribution: RubricItem;
+  }
+}
+
 export interface ProjectState {
   // App Session State
   currentUser: string | null; // ID of the TeamMember currently using the app
@@ -112,6 +131,9 @@ export interface ProjectState {
   menuPrototype: MenuPrototype;
   task6: Task6Roles;
   team: TeamMember[];
+  
+  // New: Store all reviews
+  coEvaluations: PeerReview[];
 }
 
 export interface ChatMessage {
