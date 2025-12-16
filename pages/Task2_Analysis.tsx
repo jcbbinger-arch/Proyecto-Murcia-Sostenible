@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Users, Lightbulb, Printer, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { Users, Lightbulb, Printer, ChevronDown, ChevronUp, Lock, AlertTriangle } from 'lucide-react';
 
 export const Task2_Analysis: React.FC = () => {
   const { state, assignTask, updateTaskContent, updateConcept } = useProject();
@@ -11,6 +11,10 @@ export const Task2_Analysis: React.FC = () => {
 
   // Helper to count tasks per member
   const getTaskCount = (memberId: string) => state.task2.tasks.filter(t => t.assignedToId === memberId).length;
+
+  // Determine if current user is coordinator
+  const currentUserMember = state.team.find(m => m.id === state.currentUser);
+  const isCoordinator = currentUserMember?.isCoordinator || false;
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -54,9 +58,9 @@ export const Task2_Analysis: React.FC = () => {
                 
                 <h4 className="font-bold text-lg mt-6">Pasos:</h4>
                 <ul className="list-disc pl-5">
-                    <li><strong>Paso 1: Reparto de Tareas.</strong> Usad la pantalla de "Configuración y Reparto Global" (Sidebar) o la pestaña de Reparto aquí.</li>
+                    <li><strong>Paso 1: Reparto de Tareas.</strong> Usad la pestaña de Reparto (Solo Coordinador).</li>
                     <li><strong>Paso 2: Ejecución.</strong> Cada miembro completa sus "mini-informes" asignados.</li>
-                    <li><strong>Paso 3: Conceptualización.</strong> Reunión grupal para definir nombre, concepto y valores.</li>
+                    <li><strong>Paso 3: Conceptualización.</strong> Reunión grupal para definir nombre, concepto y valores (Registra el Coordinador).</li>
                 </ul>
             </div>
         </div>
@@ -69,8 +73,27 @@ export const Task2_Analysis: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <Users size={20} /> Panel del Coordinador
                 </h3>
+
+                {!isCoordinator && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <Lock className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm text-yellow-700 font-bold">
+                                    Modo Lectura Activado
+                                </p>
+                                <p className="text-sm text-yellow-700">
+                                    Solo el Coordinador puede modificar el reparto de tareas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
                 <p className="text-sm text-gray-600 mb-4">
-                    La asignación debería hacerse preferiblemente en la página de <strong>Configuración Inicial</strong>, pero puedes ajustarla aquí.
+                    Asigna las micro-tareas de investigación a cada miembro del equipo.
                 </p>
                 
                 {/* Team Status */}
@@ -109,9 +132,10 @@ export const Task2_Analysis: React.FC = () => {
                                     </td>
                                     <td className="p-3">
                                         <select 
-                                            className="border p-2 rounded w-full max-w-[200px]"
+                                            className={`border p-2 rounded w-full max-w-[200px] ${!isCoordinator ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}`}
                                             value={task.assignedToId || ''}
                                             onChange={(e) => assignTask(task.id, e.target.value)}
+                                            disabled={!isCoordinator}
                                         >
                                             <option value="">-- Sin asignar --</option>
                                             {state.team.map(m => (
@@ -209,6 +233,25 @@ export const Task2_Analysis: React.FC = () => {
              <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <Lightbulb className="text-yellow-500" /> Decisión Grupal: El Concepto
             </h3>
+
+            {!isCoordinator && (
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <Lock className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                        </div>
+                        <div className="ml-3">
+                            <p className="text-sm text-yellow-700 font-bold">
+                                Edición Restringida
+                            </p>
+                            <p className="text-sm text-yellow-700">
+                                Esta decisión se toma en equipo, pero solo el Coordinador puede registrar los datos finales en el sistema.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <p className="text-sm text-gray-600 mb-6">
                 Tras analizar toda la información, definid la identidad del restaurante. (Esto actualiza la configuración global del proyecto).
             </p>
@@ -217,17 +260,19 @@ export const Task2_Analysis: React.FC = () => {
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Nombre del Restaurante</label>
                     <input 
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${!isCoordinator ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                         placeholder="Ej: Raíces del Valle"
                         value={state.concept.name}
                         onChange={(e) => updateConcept('name', e.target.value)}
+                        disabled={!isCoordinator}
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Concepto Principal</label>
                     <input 
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${!isCoordinator ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                         placeholder="Ej: Barra gastronómica de salazones..."
+                        disabled={!isCoordinator}
                     />
                     <p className="text-xs text-gray-400 mt-1">Define el tipo de cocina y servicio en una frase.</p>
                 </div>
@@ -236,19 +281,21 @@ export const Task2_Analysis: React.FC = () => {
             <div className="mb-6">
                  <label className="block text-sm font-bold text-gray-700 mb-2">Propuesta de Valor (Eslogan)</label>
                  <input 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${!isCoordinator ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="El eslogan que os define..."
                     value={state.concept.slogan}
                     onChange={(e) => updateConcept('slogan', e.target.value)}
+                    disabled={!isCoordinator}
                 />
             </div>
 
             <div className="mb-6">
                 <label className="block text-sm font-bold text-gray-700 mb-2">Público Objetivo Final</label>
                 <textarea 
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24"
+                    className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-24 ${!isCoordinator ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     value={state.concept.targetAudience}
                     onChange={(e) => updateConcept('targetAudience', e.target.value)}
+                    disabled={!isCoordinator}
                 />
             </div>
 
@@ -258,7 +305,7 @@ export const Task2_Analysis: React.FC = () => {
                     {[0, 1, 2].map((i) => (
                         <input 
                             key={i}
-                            className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className={`flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${!isCoordinator ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             placeholder={`Valor ${i + 1}`}
                             value={state.concept.values[i] || ''}
                             onChange={(e) => {
@@ -266,6 +313,7 @@ export const Task2_Analysis: React.FC = () => {
                                 newValues[i] = e.target.value;
                                 updateConcept('values', newValues);
                             }}
+                            disabled={!isCoordinator}
                         />
                     ))}
                 </div>
