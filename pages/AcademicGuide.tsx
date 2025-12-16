@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { BookOpen, Target, GraduationCap, Globe } from 'lucide-react';
 
@@ -121,16 +122,26 @@ export const AcademicGuide: React.FC = () => {
     }
   ];
 
-  // Helper function to generate ODS image URLs based on the UAM pattern
-  const getODSImage = (id: number) => {
-      // Using UAM pattern as requested: https://ods.uam.es/wp-content/uploads/2020/08/ODS-1-300x300.png
-      return `https://ods.uam.es/wp-content/uploads/2020/08/ODS-${id}-300x300.png`;
-  };
-
-  const ODS_LIST = Array.from({ length: 17 }, (_, i) => ({
-      id: i + 1,
-      image: getODSImage(i + 1)
-  }));
+  // ODS DATA - Manual list for better reliability than external images
+  const ODS_DATA = [
+    { id: 1, color: "bg-[#e5243b]", title: "Fin de la Pobreza", desc: "Poner fin a la pobreza en todas sus formas en todo el mundo." },
+    { id: 2, color: "bg-[#dda63a]", title: "Hambre Cero", desc: "Poner fin al hambre, lograr la seguridad alimentaria y la mejora de la nutrición." },
+    { id: 3, color: "bg-[#4c9f38]", title: "Salud y Bienestar", desc: "Garantizar una vida sana y promover el bienestar para todos en todas las edades." },
+    { id: 4, color: "bg-[#c5192d]", title: "Educación de Calidad", desc: "Garantizar una educación inclusiva, equitativa y de calidad." },
+    { id: 5, color: "bg-[#ff3a21]", title: "Igualdad de Género", desc: "Lograr la igualdad entre los géneros y empoderar a todas las mujeres y niñas." },
+    { id: 6, color: "bg-[#26bde2]", title: "Agua Limpia y Saneamiento", desc: "Garantizar la disponibilidad de agua y su gestión sostenible." },
+    { id: 7, color: "bg-[#fcc30b]", title: "Energía Asequible", desc: "Garantizar el acceso a una energía asequible, segura, sostenible y moderna." },
+    { id: 8, color: "bg-[#a21942]", title: "Trabajo Decente", desc: "Promover el crecimiento económico sostenido, inclusivo y sostenible." },
+    { id: 9, color: "bg-[#fd6925]", title: "Industria e Innovación", desc: "Construir infraestructuras resilientes, promover la industrialización inclusiva." },
+    { id: 10, color: "bg-[#dd1367]", title: "Reducción de las Desigualdades", desc: "Reducir la desigualdad en y entre los países." },
+    { id: 11, color: "bg-[#fd9d24]", title: "Ciudades Sostenibles", desc: "Lograr que las ciudades sean más inclusivas, seguras, resilientes y sostenibles." },
+    { id: 12, color: "bg-[#bf8b2e]", title: "Producción y Consumo", desc: "Garantizar modalidades de consumo y producción sostenibles." },
+    { id: 13, color: "bg-[#3f7e44]", title: "Acción por el Clima", desc: "Adoptar medidas urgentes para combatir el cambio climático y sus efectos." },
+    { id: 14, color: "bg-[#0a97d9]", title: "Vida Submarina", desc: "Conservar y utilizar en forma sostenible los océanos y mares." },
+    { id: 15, color: "bg-[#56c02b]", title: "Vida de Ecosistemas", desc: "Gestionar sosteniblemente los bosques y luchar contra la desertificación." },
+    { id: 16, color: "bg-[#00689d]", title: "Paz y Justicia", desc: "Promover sociedades justas, pacíficas e inclusivas." },
+    { id: 17, color: "bg-[#19486a]", title: "Alianzas", desc: "Revitalizar la Alianza Mundial para el Desarrollo Sostenible." },
+  ];
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -246,19 +257,17 @@ export const AcademicGuide: React.FC = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {ODS_LIST.map((ods) => (
-                    <div key={ods.id} className="group cursor-pointer">
-                        <img 
-                            src={ods.image} 
-                            alt={`ODS ${ods.id}`} 
-                            className="w-full h-auto rounded-lg shadow-md hover:scale-105 transition-transform duration-300 bg-gray-100"
-                            loading="lazy"
-                            onError={(e) => {
-                                // Fallback to a placeholder or generic image if UAM link fails
-                                (e.target as HTMLImageElement).src = `https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/ODS_${ods.id < 10 ? '0' : ''}${ods.id}.svg/240px-ODS_${ods.id < 10 ? '0' : ''}${ods.id}.svg.png`; 
-                            }}
-                        />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {ODS_DATA.map((ods) => (
+                    <div key={ods.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden h-full">
+                         <div className={`${ods.color} p-4 text-white flex justify-between items-center`}>
+                            <span className="font-black text-2xl opacity-90">{ods.id}</span>
+                            <Target size={24} className="opacity-80" />
+                        </div>
+                        <div className="p-5 flex-1 flex flex-col">
+                            <h4 className="font-bold text-gray-900 text-lg mb-3 leading-tight">{ods.title}</h4>
+                            <p className="text-sm text-gray-600 leading-relaxed">{ods.desc}</p>
+                        </div>
                     </div>
                 ))}
             </div>
