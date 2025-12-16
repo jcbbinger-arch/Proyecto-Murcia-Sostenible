@@ -8,20 +8,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body { font-family: 'Inter', sans-serif; }
+      
+      /* DEFINITIVE PRINT STYLES */
       @media print {
-        @page { margin: 1cm; size: A4; }
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
-        .no-print { display: none !important; }
-        .print-only { display: block !important; }
+        @page { 
+            margin: 0.8cm; 
+            size: A4; 
+        }
         
-        /* Critical: Reset the sidebar margin on the main container */
-        main { margin-left: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+        body { 
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important; 
+            background-color: white !important; 
+        }
+
+        /* HIDE UI ELEMENTS */
+        .no-print, nav, aside, button, .gemini-chat-widget { 
+            display: none !important; 
+        }
         
-        /* Ensure shadows and borders print nicely */
-        * { box-shadow: none !important; text-shadow: none !important; }
+        /* LAYOUT RESET - Critical to prevent sidebar gap and overflow */
+        body, #root, main, .flex, .flex-col, .flex-row { 
+            display: block !important; 
+            width: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            height: auto !important; 
+            overflow: visible !important;
+            position: static !important;
+        }
+
+        /* Remove shadows and text-shadows for cleaner print */
+        * { 
+            box-shadow: none !important; 
+            text-shadow: none !important; 
+        }
         
         /* Ensure inputs look like text */
-        input, textarea, select { border: none !important; background: transparent !important; resize: none; appearance: none; padding: 0 !important; }
+        input, textarea, select { 
+            border: none !important; 
+            background: transparent !important; 
+            resize: none; 
+            appearance: none; 
+            padding: 0 !important; 
+        }
+        
+        /* Prevent page breaks inside cards if possible */
+        .break-inside-avoid {
+            page-break-inside: avoid;
+        }
       }
     </style>
   <script type="importmap">

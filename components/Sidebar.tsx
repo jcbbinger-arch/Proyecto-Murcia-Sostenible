@@ -60,7 +60,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 no-print z-10">
+    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 no-print z-10 overflow-hidden">
       <div className="p-5 border-b border-gray-100 bg-gray-50">
         <Link to="/" className="text-xl font-bold text-green-800 flex items-center gap-2 hover:opacity-80 transition-opacity">
             <FileText className="text-green-600" size={24}/>
@@ -166,7 +166,7 @@ export const Sidebar: React.FC = () => {
             Reiniciar Proyecto
         </button>
 
-        {/* AUTHOR BADGE */}
+        {/* AUTHOR BADGE WITH CORRECTED LOGO */}
         <div className="pt-3 border-t border-gray-100 flex flex-col items-center">
             <p className="text-[10px] font-bold text-purple-900 uppercase tracking-widest mb-1.5">Created By</p>
             <div className="bg-[#0f172a] rounded-xl p-2.5 flex items-center gap-3 w-full shadow-md border border-gray-700">

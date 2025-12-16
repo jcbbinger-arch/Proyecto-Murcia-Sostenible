@@ -72,8 +72,8 @@ export const FinalMemory: React.FC = () => {
             .break-after-page { page-break-after: always; }
             .break-before-page { page-break-before: always; }
             .break-inside-avoid { page-break-inside: avoid; }
-            a[href]:after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
-            /* Force images to print */
+            /* Disable link URL appending to prevent duplication */
+            a[href]:after { content: none !important; }
             img { max-width: 100% !important; }
         }
       `}</style>
@@ -88,7 +88,7 @@ export const FinalMemory: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white p-12 shadow-lg print:shadow-none print:p-8 min-h-screen print:w-full">
+      <div className="bg-white p-12 shadow-lg print:shadow-none print:p-8 min-h-screen print:min-h-0 print:w-full">
         {/* === PORTADA === */}
         <div className="flex justify-between items-center border-b-2 border-gray-900 pb-4 mb-16 print:mb-8">
             <div className="flex items-center gap-4">
@@ -202,7 +202,8 @@ export const FinalMemory: React.FC = () => {
         {/* === CAPÍTULO 3 === */}
         <section className="mb-16 break-after-page">
             <h2 className="text-4xl font-bold text-blue-900 mb-8 border-b-4 border-blue-500 pb-4">Capítulo 3: La Carta</h2>
-            <div className="border-[6px] double border-gray-800 p-12 max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none print:border-4">
+            {/* Changed from double to solid border for better print support */}
+            <div className="border-4 border-gray-800 p-12 max-w-4xl mx-auto bg-white shadow-2xl print:shadow-none">
                 <div className="text-center border-b-2 border-gray-200 pb-8 mb-8">
                      <h3 className="text-5xl font-serif font-black text-gray-900 mb-2">{state.concept.name}</h3>
                      <p className="text-gray-500 uppercase tracking-widest text-sm">Menú de Temporada</p>
