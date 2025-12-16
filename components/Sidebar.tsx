@@ -60,7 +60,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 no-print z-10 overflow-hidden">
+    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 z-10 overflow-hidden no-print print:hidden">
       <div className="p-5 border-b border-gray-100 bg-gray-50">
         <Link to="/" className="text-xl font-bold text-green-800 flex items-center gap-2 hover:opacity-80 transition-opacity">
             <FileText className="text-green-600" size={24}/>

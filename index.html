@@ -9,54 +9,111 @@
     <style>
       body { font-family: 'Inter', sans-serif; }
       
-      /* DEFINITIVE PRINT STYLES */
+      /* ACADEMIC PRINT STYLES - STRICT FORMATTING */
       @media print {
         @page { 
-            margin: 0.8cm; 
+            margin: 2.5cm; /* Requisito: Márgenes 2,5 */
             size: A4; 
         }
         
         body { 
+            background-color: white !important;
+            font-family: 'Calibri', sans-serif !important; /* Requisito: Cuerpo Calibri */
+            font-size: 11pt !important; /* Requisito: Tamaño 11 */
+            line-height: 1.15 !important; /* Requisito: Interlineado 1,15 */
+            color: black !important;
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important; 
-            background-color: white !important; 
         }
 
-        /* HIDE UI ELEMENTS */
-        .no-print, nav, aside, button, .gemini-chat-widget { 
-            display: none !important; 
-        }
-        
-        /* LAYOUT RESET - Critical to prevent sidebar gap and overflow */
-        body, #root, main, .flex, .flex-col, .flex-row { 
+        /* Reset layout for document flow */
+        #root, main, .flex, .flex-col { 
             display: block !important; 
             width: 100% !important; 
             margin: 0 !important; 
             padding: 0 !important; 
             height: auto !important; 
             overflow: visible !important;
-            position: static !important;
         }
 
-        /* Remove shadows and text-shadows for cleaner print */
-        * { 
-            box-shadow: none !important; 
-            text-shadow: none !important; 
+        /* HIDE UI ELEMENTS */
+        .no-print, nav, aside, button, .gemini-chat-widget, .hide-in-print { 
+            display: none !important; 
+        }
+
+        /* Academic Clean Up - Remove background colors for formal look */
+        .bg-blue-50, .bg-green-50, .bg-orange-50, .bg-purple-50, .bg-red-50, .bg-gray-50, .bg-yellow-50 {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin-bottom: 1em !important;
         }
         
-        /* Ensure inputs look like text */
-        input, textarea, select { 
-            border: none !important; 
-            background: transparent !important; 
-            resize: none; 
-            appearance: none; 
-            padding: 0 !important; 
+        /* Borders for tables remain */
+        table, th, td {
+            border-color: #000 !important;
         }
-        
-        /* Prevent page breaks inside cards if possible */
-        .break-inside-avoid {
+
+        /* Counters for Figures and Tables */
+        body {
+            counter-reset: figCount tabCount;
+        }
+
+        .academic-figure {
+            display: block;
             page-break-inside: avoid;
+            margin-bottom: 2em;
+            text-align: center;
         }
+
+        .academic-table-container {
+            display: block;
+            page-break-inside: avoid;
+            margin-bottom: 2em;
+            width: 100%;
+        }
+
+        /* Requisito: Nombradas en la parte superior */
+        .academic-caption-top {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 0.5em;
+        }
+
+        .academic-figure .academic-caption-top::before {
+            counter-increment: figCount;
+            content: "Figura " counter(figCount) ". ";
+        }
+
+        .academic-table-container .academic-caption-top::before {
+            counter-increment: tabCount;
+            content: "Tabla " counter(tabCount) ". ";
+        }
+
+        /* Requisito: Fuente en la parte inferior */
+        .academic-source-bottom {
+            display: block;
+            text-align: left;
+            font-size: 10pt;
+            font-style: italic;
+            margin-top: 0.5em;
+            color: #444;
+        }
+
+        .academic-source-bottom::before {
+            content: "Fuente: ";
+        }
+
+        /* Standardize text alignment */
+        p, li, div {
+            text-align: justify;
+        }
+        
+        /* Links style */
+        a { text-decoration: none !important; color: black !important; }
+        a[href]:after { content: none !important; }
       }
     </style>
   <script type="importmap">

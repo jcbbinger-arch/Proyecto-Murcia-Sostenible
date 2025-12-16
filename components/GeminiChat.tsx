@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, Sparkles } from 'lucide-react';
 import { sendMessageToGemini } from '../services/geminiService';
@@ -33,7 +34,7 @@ export const GeminiChat: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 no-print">
+    <div className="fixed bottom-6 right-6 z-50 no-print print:hidden">
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}

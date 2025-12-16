@@ -28,7 +28,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="flex bg-gray-50 min-h-screen font-sans text-gray-900">
       {!isLanding && <Sidebar />}
       
-      <main className={`flex-1 transition-all duration-300 ${!isLanding ? 'ml-64' : ''}`}>
+      <main className={`flex-1 transition-all duration-300 ${!isLanding ? 'ml-64 print:ml-0 print:w-full' : ''}`}>
         {children}
       </main>
 
