@@ -86,7 +86,7 @@ export interface Task6Roles {
 
 // --- NEW CO-EVALUATION TYPES ---
 export interface RubricItem {
-  score: number; // 0.5 or -0.5
+  score: number; // 0.25 or -0.25
   justification: string;
 }
 

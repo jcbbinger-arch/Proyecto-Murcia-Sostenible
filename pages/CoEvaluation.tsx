@@ -4,6 +4,79 @@ import { useProject } from '../context/ProjectContext';
 import { User, AlertTriangle, Save, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { PeerReview, RubricItem } from '../types';
 
+// Moved outside to ensure stable component identity and prevent input focus loss
+interface RubricRowProps {
+    category: 'participation' | 'responsibility' | 'collaboration' | 'contribution';
+    title: string;
+    descPos: string;
+    descNeg: string;
+    score: number;
+    justification: string;
+    onUpdate: (category: 'participation' | 'responsibility' | 'collaboration' | 'contribution', field: 'score' | 'justification', value: any) => void;
+}
+
+const RubricRow: React.FC<RubricRowProps> = ({ 
+    category, 
+    title, 
+    descPos, 
+    descNeg, 
+    score, 
+    justification, 
+    onUpdate 
+}) => (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+        <h4 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm">
+                {category === 'participation' ? '1' : category === 'responsibility' ? '2' : category === 'collaboration' ? '3' : '4'}
+            </span>
+            {title}
+        </h4>
+        
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <button 
+              onClick={() => onUpdate(category, 'score', 0.25)}
+              className={`p-4 rounded-lg border-2 text-left transition-all relative ${
+                  score === 0.25 
+                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                  : 'border-gray-200 hover:border-green-200'
+              }`}
+            >
+                <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-green-700 flex items-center gap-2"><ThumbsUp size={16}/> Positivo (+0.25)</span>
+                </div>
+                <p className="text-xs text-gray-600">{descPos}</p>
+            </button>
+
+            <button 
+              onClick={() => onUpdate(category, 'score', -0.25)}
+              className={`p-4 rounded-lg border-2 text-left transition-all relative ${
+                  score === -0.25 
+                  ? 'border-red-500 bg-red-50 ring-2 ring-red-200' 
+                  : 'border-gray-200 hover:border-red-200'
+              }`}
+            >
+                <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-red-700 flex items-center gap-2"><ThumbsDown size={16}/> Negativo (-0.25)</span>
+                </div>
+                <p className="text-xs text-gray-600">{descNeg}</p>
+            </button>
+        </div>
+
+        <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <MessageSquare size={16} /> Justificación Obligatoria
+            </label>
+            <textarea 
+                className="w-full border border-gray-300 rounded p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                rows={2}
+                placeholder={`Explica por qué has elegido esta puntuación para ${title}...`}
+                value={justification}
+                onChange={(e) => onUpdate(category, 'justification', e.target.value)}
+            />
+        </div>
+    </div>
+);
+
 export const CoEvaluation: React.FC = () => {
   const { state, savePeerReview } = useProject();
   const [targetId, setTargetId] = useState<string>('');
@@ -85,68 +158,6 @@ export const CoEvaluation: React.FC = () => {
       }
   };
 
-  const RubricRow = ({ 
-      category, 
-      title, 
-      descPos, 
-      descNeg 
-  }: { 
-      category: keyof typeof form, 
-      title: string, 
-      descPos: string, 
-      descNeg: string 
-  }) => (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
-          <h4 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm">{category === 'participation' ? '1' : category === 'responsibility' ? '2' : category === 'collaboration' ? '3' : '4'}</span>
-              {title}
-          </h4>
-          
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <button 
-                onClick={() => updateItem(category, 'score', 0.5)}
-                className={`p-4 rounded-lg border-2 text-left transition-all relative ${
-                    form[category].score === 0.5 
-                    ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
-                    : 'border-gray-200 hover:border-green-200'
-                }`}
-              >
-                  <div className="flex justify-between items-start mb-2">
-                      <span className="font-bold text-green-700 flex items-center gap-2"><ThumbsUp size={16}/> Positivo (+0.5)</span>
-                  </div>
-                  <p className="text-xs text-gray-600">{descPos}</p>
-              </button>
-
-              <button 
-                onClick={() => updateItem(category, 'score', -0.5)}
-                className={`p-4 rounded-lg border-2 text-left transition-all relative ${
-                    form[category].score === -0.5 
-                    ? 'border-red-500 bg-red-50 ring-2 ring-red-200' 
-                    : 'border-gray-200 hover:border-red-200'
-                }`}
-              >
-                  <div className="flex justify-between items-start mb-2">
-                      <span className="font-bold text-red-700 flex items-center gap-2"><ThumbsDown size={16}/> Negativo (-0.5)</span>
-                  </div>
-                  <p className="text-xs text-gray-600">{descNeg}</p>
-              </button>
-          </div>
-
-          <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                  <MessageSquare size={16} /> Justificación Obligatoria
-              </label>
-              <textarea 
-                  className="w-full border border-gray-300 rounded p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  rows={2}
-                  placeholder={`Explica por qué has elegido esta puntuación para ${title}...`}
-                  value={form[category].justification}
-                  onChange={(e) => updateItem(category, 'justification', e.target.value)}
-              />
-          </div>
-      </div>
-  );
-
   if (!state.currentUser) {
        return (
           <div className="p-8 text-center">
@@ -202,24 +213,36 @@ export const CoEvaluation: React.FC = () => {
                 title="Participación" 
                 descPos="Participa de manera regular, aporta ideas, se involucra en discusiones y mantiene constancia."
                 descNeg="Participa de forma escasa, puntual o nula; no aporta al desarrollo del trabajo."
+                score={form.participation.score}
+                justification={form.participation.justification}
+                onUpdate={updateItem}
               />
               <RubricRow 
                 category="responsibility" 
                 title="Responsabilidad y Cumplimiento" 
                 descPos="Asume y realiza sus tareas con seriedad, cumple plazos y muestra autonomía."
                 descNeg="No cumple con las tareas asignadas, entrega tarde o depende excesivamente de otros."
+                score={form.responsibility.score}
+                justification={form.responsibility.justification}
+                onUpdate={updateItem}
               />
               <RubricRow 
                 category="collaboration" 
                 title="Capacidad de Colaboración" 
                 descPos="Escucha, respeta opiniones, coopera, comunica con claridad y ayuda a resolver conflictos."
                 descNeg="No colabora, genera conflictos, no respeta opiniones o dificulta la dinámica del grupo."
+                score={form.collaboration.score}
+                justification={form.collaboration.justification}
+                onUpdate={updateItem}
               />
               <RubricRow 
                 category="contribution" 
                 title="Aportación al Resultado Final" 
                 descPos="Sus aportaciones tienen calidad, mejoran el resultado final y ayudan a cumplir objetivos."
                 descNeg="Sus aportaciones son mínimas, irrelevantes o incluso entorpecen el resultado del equipo."
+                score={form.contribution.score}
+                justification={form.contribution.justification}
+                onUpdate={updateItem}
               />
 
               <div className="fixed bottom-0 left-64 right-0 p-4 bg-white border-t border-gray-200 shadow-lg flex justify-end items-center z-20">
@@ -231,7 +254,7 @@ export const CoEvaluation: React.FC = () => {
                               : "text-red-600 font-bold"
                           }>
                               {(form.participation.score + form.responsibility.score + form.collaboration.score + form.contribution.score) > 0 ? '+' : ''}
-                              {(form.participation.score + form.responsibility.score + form.collaboration.score + form.contribution.score) * 0.5} Puntos
+                              {(form.participation.score + form.responsibility.score + form.collaboration.score + form.contribution.score)} Puntos
                           </span> (Ref)
                       </div>
                       <button 
