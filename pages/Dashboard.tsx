@@ -1,7 +1,8 @@
+
 import React, { useRef, useState } from 'react';
 import { useProject } from '../context/ProjectContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Upload, FileText, User, Lock, LogIn } from 'lucide-react';
+import { ArrowRight, Upload, FileText, User, Lock, LogIn, Download } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { state, resetProject, importProjectData, setCurrentUser } = useProject();
@@ -17,6 +18,19 @@ export const Dashboard: React.FC = () => {
           localStorage.removeItem('murcia_project_data');
           window.location.reload(); // Hard reload to clear context
       }
+  };
+
+  const handleBackup = () => {
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeName = state.teamName ? state.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'proyecto';
+    const date = new Date().toISOString().slice(0, 10);
+    
+    link.href = url;
+    link.download = `BACKUP_MURCIA_${safeName}_${date}.json`;
+    link.click();
   };
 
   const handleLoadClick = () => {
@@ -113,12 +127,12 @@ export const Dashboard: React.FC = () => {
               <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:scale-110 transition-transform">
                   <Upload size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Cargar Proyecto de Equipo</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Cargar Proyecto / Restaurar</h3>
               <p className="text-gray-600 mb-6">
-                  Si ya tienes el archivo <code>.json</code> (Configuración del Coordinador o tu propio avance), cárgalo aquí para continuar trabajando.
+                  Si tienes un archivo <code>.json</code> (Backup, Configuración del Coordinador, etc.), cárgalo aquí para continuar trabajando.
               </p>
               <button className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                  <FileText size={20} /> Seleccionar Archivo
+                  <FileText size={20} /> Cargar Archivo
               </button>
               <input 
                   type="file" 
@@ -169,9 +183,16 @@ export const Dashboard: React.FC = () => {
                       </p>
                   </div>
               </div>
-              <div className="text-right text-sm text-gray-500">
-                  <p>Recuerda guardar tus cambios exportando</p>
-                  <p>tu trabajo en la sección <strong>Sincronización</strong>.</p>
+              <div className="flex items-center gap-4 text-right">
+                  <div className="text-sm text-gray-500 hidden md:block">
+                      <p>Guarda tu trabajo frecuentemente.</p>
+                  </div>
+                  <button 
+                    onClick={handleBackup}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-700 flex items-center gap-2 shadow-sm"
+                  >
+                      <Download size={18} /> Backup
+                  </button>
               </div>
           </div>
       )}

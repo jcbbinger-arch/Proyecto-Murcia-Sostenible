@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool, Scale } from 'lucide-react';
+import { FileText, LayoutDashboard, DollarSign, Printer, Users, Microscope, UtensilsCrossed, Palette, Share2, Rocket, Settings, Home, GraduationCap, PenTool, Scale, Download } from 'lucide-react';
 import { useProject } from '../context/ProjectContext';
 
 interface NavItemProps {
@@ -29,6 +29,19 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, colorClass }) => (
 
 export const Sidebar: React.FC = () => {
   const { state, resetProject } = useProject();
+
+  const handleBackup = () => {
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeName = state.teamName ? state.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'proyecto';
+    const date = new Date().toISOString().slice(0, 10);
+    
+    link.href = url;
+    link.download = `BACKUP_MURCIA_${safeName}_${date}.json`;
+    link.click();
+  };
 
   const creationItems = [
     { to: "/task-1", icon: <Users size={18} />, label: "1. Equipo y Zona" },
@@ -138,6 +151,14 @@ export const Sidebar: React.FC = () => {
                 </div>
             </div>
         </div>
+        
+        <button 
+            onClick={handleBackup}
+            className="w-full mb-2 bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors"
+        >
+            <Download size={14} /> Descargar Copia
+        </button>
+
         <button 
             onClick={resetProject}
             className="w-full text-[10px] text-red-400 hover:text-red-600 hover:underline text-center"
