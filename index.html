@@ -42,13 +42,30 @@
         }
 
         /* Academic Clean Up - Remove background colors for formal look */
-        .bg-blue-50, .bg-green-50, .bg-orange-50, .bg-purple-50, .bg-red-50, .bg-gray-50, .bg-yellow-50 {
+        /* EXCEPTION: .member-badge is allowed to have color */
+        .bg-blue-50:not(.member-badge), 
+        .bg-green-50:not(.member-badge), 
+        .bg-orange-50:not(.member-badge), 
+        .bg-purple-50:not(.member-badge), 
+        .bg-red-50:not(.member-badge), 
+        .bg-gray-50:not(.member-badge), 
+        .bg-yellow-50:not(.member-badge) {
             background-color: transparent !important;
             border: none !important;
             padding: 0 !important;
             margin-bottom: 1em !important;
         }
         
+        /* Force color for badges */
+        .member-badge {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            border: 1px solid #ccc !important; 
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            display: inline-block !important;
+        }
+
         /* Borders for tables remain */
         table, th, td {
             border-color: #000 !important;

@@ -1,10 +1,18 @@
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { Printer, AlertTriangle, User, Scale, ExternalLink, Info } from 'lucide-react';
+import { Printer, Info } from 'lucide-react';
 import { DishType } from '../types';
 
+// Palette for team members to be used in badges
+const MEMBER_COLORS = [
+    { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+    { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
+    { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
+    { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
+    { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-200' },
+];
+
 // Helper component for Academic Figures (Images)
-// Requisito: Numeradas, nombradas arriba, fuente abajo.
 const AcademicFigure: React.FC<{ src: string; alt: string; title: string; source?: string; className?: string }> = ({ src, alt, title, source = "Elaboración propia", className = "" }) => (
     <figure className={`academic-figure ${className}`}>
         <figcaption className="academic-caption-top">{title}</figcaption>
@@ -14,7 +22,6 @@ const AcademicFigure: React.FC<{ src: string; alt: string; title: string; source
 );
 
 // Helper component for Academic Tables
-// Requisito: Numeradas, nombradas arriba, fuente abajo.
 const AcademicTable: React.FC<{ title: string; children: React.ReactNode; source?: string }> = ({ title, children, source = "Elaboración propia" }) => (
     <div className="academic-table-container">
         <div className="academic-caption-top">{title}</div>
@@ -32,7 +39,20 @@ export const FinalMemory: React.FC = () => {
     window.print();
   };
 
-  const editorNames = state.team.filter(m => state.task6.editorIds.includes(m.id)).map(m => m.name).join(', ');
+  // Helper to get member style
+  const getMemberBadge = (memberId: string | null) => {
+      if (!memberId) return <span className="text-gray-400 text-xs italic">Sin asignar</span>;
+      
+      const memberIndex = state.team.findIndex(m => m.id === memberId);
+      const memberName = state.team.find(m => m.id === memberId)?.name || "Desconocido";
+      const style = memberIndex >= 0 ? MEMBER_COLORS[memberIndex % MEMBER_COLORS.length] : { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' };
+
+      return (
+          <span className={`member-badge inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${style.bg} ${style.text} ${style.border}`}>
+              {memberName}
+          </span>
+      );
+  };
 
   return (
     <div className="p-8 max-w-5xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">
@@ -51,14 +71,11 @@ export const FinalMemory: React.FC = () => {
         <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg flex items-start gap-3">
             <Info className="text-yellow-600 shrink-0 mt-1" />
             <div className="text-sm text-yellow-800">
-                <p className="font-bold mb-1">Formato Académico Aplicado (Modo Impresión):</p>
+                <p className="font-bold mb-1">Formato Académico Aplicado:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li>Tipografía: <strong>Calibri 11pt</strong>.</li>
-                    <li>Interlineado: <strong>1,15</strong>.</li>
-                    <li>Márgenes: <strong>2,5 cm</strong>.</li>
-                    <li>Tablas y Figuras: Numeración automática, título arriba, fuente abajo.</li>
+                    <li>Tipografía Calibri 11pt, Interlineado 1.15.</li>
+                    <li>Las etiquetas de color identifican a cada alumno responsable de la tarea.</li>
                 </ul>
-                <p className="mt-2 text-xs">Recuerda subir también la presentación oral al Aula Virtual.</p>
             </div>
         </div>
       </div>
@@ -97,9 +114,15 @@ export const FinalMemory: React.FC = () => {
                 <p className="uppercase tracking-[0.2em] font-bold text-green-800 mb-4 print:text-black">Proyecto Murcia Sostenible</p>
                 <p className="text-2xl font-bold text-gray-900 mb-8">{state.teamName || "Nombre del Equipo"}</p>
                 
-                <div className="border-t border-gray-300 w-1/2 mx-auto pt-4 text-sm">
-                    <p><strong>Integrantes del Equipo:</strong></p>
-                    <p className="mt-1">{state.team.map(m => m.name).join(', ')}</p>
+                <div className="border-t border-gray-300 w-2/3 mx-auto pt-4 text-sm">
+                    <p className="mb-2"><strong>Integrantes del Equipo:</strong></p>
+                    <div className="flex flex-wrap justify-center gap-2 mt-1">
+                        {state.team.map(m => (
+                            <div key={m.id}>
+                                {getMemberBadge(m.id)}
+                            </div>
+                        ))}
+                    </div>
                     <p className="mt-4 text-xs text-gray-500">Fecha de entrega: {new Date().toLocaleDateString()}</p>
                 </div>
             </div>
@@ -163,10 +186,12 @@ export const FinalMemory: React.FC = () => {
              
              <div className="space-y-6">
                 {state.task2.tasks.filter(t => t.content && t.content.length > 5).map((task) => (
-                    <div key={task.id} className="mb-4">
-                        <h4 className="font-bold text-lg mb-2">{task.title}</h4>
+                    <div key={task.id} className="mb-4 border-l-2 border-gray-300 pl-4">
+                        <div className="flex justify-between items-start mb-2">
+                             <h4 className="font-bold text-lg">{task.title}</h4>
+                             {getMemberBadge(task.assignedToId)}
+                        </div>
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">{task.content}</p>
-                        <p className="text-xs italic text-gray-500 mt-1">Responsable: {state.team.find(m => m.id === task.assignedToId)?.name}</p>
                     </div>
                 ))}
              </div>
@@ -184,11 +209,16 @@ export const FinalMemory: React.FC = () => {
                         return (
                             <div key={type} className="mb-6 break-inside-avoid">
                                 <h4 className="font-bold uppercase text-sm mb-2 underline">{type}</h4>
-                                <ul className="space-y-2">
+                                <ul className="space-y-3">
                                     {dishes.map(dish => (
                                         <li key={dish.id} className="text-sm">
-                                            <div className="font-bold">{dish.name} ...................... {dish.price}€</div>
-                                            <div className="text-xs italic">{dish.description}</div>
+                                            <div className="flex justify-center items-center gap-2">
+                                                <span className="font-bold">{dish.name}</span>
+                                                <span className="mx-1">......................</span>
+                                                <span>{dish.price}€</span>
+                                                <span className="scale-75 origin-left">{getMemberBadge(dish.author)}</span>
+                                            </div>
+                                            <div className="text-xs italic mt-0.5">{dish.description}</div>
                                         </li>
                                     ))}
                                 </ul>
@@ -205,7 +235,10 @@ export const FinalMemory: React.FC = () => {
             
             {state.dishes.map(dish => (
                 <div key={dish.id} className="mb-8 break-after-page">
-                    <h3 className="font-bold text-xl mb-4">{dish.name} ({dish.type})</h3>
+                    <div className="flex justify-between items-center mb-4 border-b pb-2">
+                         <h3 className="font-bold text-xl">{dish.name} ({dish.type})</h3>
+                         {getMemberBadge(dish.author)}
+                    </div>
                     
                     {dish.photo && (
                         <div className="mb-4 max-w-sm mx-auto">
@@ -253,9 +286,11 @@ export const FinalMemory: React.FC = () => {
              <p className="mb-4">
                  Enlace al diseño: <a href={state.menuPrototype.digitalLink} target="_blank" className="underline">{state.menuPrototype.digitalLink || "No disponible"}</a>
              </p>
+             <p className="text-xs mb-4">Responsables: {state.task6.designerIds.map(id => getMemberBadge(id))}</p>
 
              <h3 className="font-bold text-lg mb-2">5.3 Prototipo Físico</h3>
-             <p className="mb-4">{state.menuPrototype.physicalDescription}</p>
+             <p className="mb-2">{state.menuPrototype.physicalDescription}</p>
+             <p className="text-xs mb-4">Responsables: {state.task6.artisanIds.map(id => getMemberBadge(id))}</p>
              
              {state.menuPrototype.physicalPhoto && (
                  <AcademicFigure 
@@ -272,6 +307,9 @@ export const FinalMemory: React.FC = () => {
             
             {state.dishes.map((dish) => (
                 <div key={dish.id} className="mb-8 break-inside-avoid">
+                    <div className="mb-1 flex justify-end">
+                        {getMemberBadge(dish.author)}
+                    </div>
                     <AcademicTable title={`Escandallo: ${dish.name}`}>
                         <div className="text-sm p-2">
                             <div className="grid grid-cols-2 gap-4 mb-2">
